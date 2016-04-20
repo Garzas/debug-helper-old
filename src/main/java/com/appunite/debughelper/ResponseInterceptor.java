@@ -4,16 +4,21 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import okhttp3.Interceptor;
-import okhttp3.Response;
+import javax.inject.Singleton;
 
-//@Singleton
-public class DelayInterceptor implements Interceptor
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+@Singleton
+public class ResponseInterceptor implements Interceptor
 {
     private static int mDelay = 1;
 
 
-    public DelayInterceptor() {
+    public ResponseInterceptor() {
     }
 
     @Override
@@ -21,8 +26,14 @@ public class DelayInterceptor implements Interceptor
     {
         this.sleep();
         Log.d("NetworkSlowdown", "Network slowdown done. Proceeding chain");
+        Request request = chain.request();
+        Response response = chain.proceed(request);
+        String stringJson = response.body().string();
+        MediaType contentType = response.body().contentType();
+        ResponseBody body = ResponseBody.create(contentType, stringJson);
+        return response.newBuilder().body(body).build();
 
-        return chain.proceed(chain.request());
+//        return chain.proceed(chain.request());
     }
 
     /**
