@@ -4,8 +4,7 @@ package com.appunite.debughelper;
 import android.content.Context;
 import android.os.Build;
 
-import com.appunite.detector.SimpleDetector;
-import com.appunite.rx.internal.Objects;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -61,7 +60,7 @@ public class DebugPresenter {
     private final Context context;
 
 
-    public abstract static class BaseDebugItem implements SimpleDetector.Detectable<BaseDebugItem> {
+    public abstract static class BaseDebugItem {
     }
 
     public class CategoryItem extends BaseDebugItem {
@@ -76,16 +75,6 @@ public class DebugPresenter {
         @Nonnull
         public String getTitle() {
             return title;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseDebugItem item) {
-            return false;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseDebugItem item) {
-            return false;
         }
 
         public Observer<Object> clickObserver() {
@@ -138,16 +127,6 @@ public class DebugPresenter {
             return Objects.hashCode(name, value);
         }
 
-        @Override
-        public boolean matches(@Nonnull BaseDebugItem item) {
-            return item instanceof InformationItem && name.equals(((InformationItem) item).name);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseDebugItem item) {
-            return equals(item);
-        }
-
         public Observer<Object> clickObserver() {
             return Observers.create(new Action1<Object>() {
                 @Override
@@ -195,16 +174,6 @@ public class DebugPresenter {
         @Override
         public int hashCode() {
             return Objects.hashCode(name, values);
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseDebugItem item) {
-            return item instanceof SpinnerItem && name.equals(((SpinnerItem) item).name);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseDebugItem item) {
-            return equals(item);
         }
 
         public Observer<Integer> clickObserver() {
@@ -255,16 +224,6 @@ public class DebugPresenter {
             return Objects.hashCode(title, option);
         }
 
-        @Override
-        public boolean matches(@Nonnull BaseDebugItem item) {
-            return item instanceof SwitchItem && title.equals(((SwitchItem) item).title);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseDebugItem item) {
-            return equals(item);
-        }
-
         public Observer<Boolean> switchOption() {
             return Observers.create(new Action1<Boolean>() {
                 @Override
@@ -311,16 +270,6 @@ public class DebugPresenter {
         @Override
         public int hashCode() {
             return Objects.hashCode(name, action);
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseDebugItem item) {
-            return item instanceof ActionItem && name.equals(((ActionItem) item).name);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseDebugItem item) {
-            return equals(item);
         }
 
         public Observer<Object> actionOption() {

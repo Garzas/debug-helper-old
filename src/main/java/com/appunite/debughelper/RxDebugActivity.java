@@ -4,20 +4,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appunite.example.debugutilsexample.dagger.BaseActivityComponent;
-import com.appunite.example.debugutilsexample.dagger.BaseActivityComponentProvider;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
-import javax.annotation.Nonnull;
 
 
-public abstract class RxDebugActivity extends RxAppCompatActivity implements BaseActivityComponentProvider {
-
-    private BaseActivityComponent activityComponent;
+public abstract class RxDebugActivity extends RxAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        activityComponent = createActivityComponent(savedInstanceState);
         super.onCreate(savedInstanceState);
         DebugHelper.setActivity(this);
 
@@ -50,8 +44,4 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Bas
         DebugHelper.onResume();
     }
 
-    @Nonnull
-    public BaseActivityComponent getActivityComponent() {
-        return activityComponent;
-    }
 }

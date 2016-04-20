@@ -9,14 +9,13 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.appunite.detector.ChangesDetector;
-import com.appunite.detector.SimpleDetector;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxAdapterView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
 
 import java.util.List;
+
 
 import javax.annotation.Nonnull;
 
@@ -38,7 +37,7 @@ abstract class BaseDebugHolder extends RecyclerView.ViewHolder {
 }
 
 public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implements
-        Action1<List<DebugPresenter.BaseDebugItem>>, ChangesDetector.ChangesAdapter {
+        Action1<List<DebugPresenter.BaseDebugItem>> {
 
     private static final int TYPE_CATEGORY = 0;
     private static final int TYPE_INFORMATION = 1;
@@ -257,8 +256,6 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 //    private final Context mContext;
 
 
-    @Nonnull
-    private final ChangesDetector<DebugPresenter.BaseDebugItem, DebugPresenter.BaseDebugItem> changesDetector;
 
     @Nonnull
     private List<DebugPresenter.BaseDebugItem> baseDebugItems = ImmutableList.of();
@@ -268,14 +265,12 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
     public DebugAdapter(DebugDrawerPreferences debugPreferences) {
         this.debugPreferences = debugPreferences;
-        this.changesDetector = new ChangesDetector<>(new SimpleDetector<DebugPresenter.BaseDebugItem>());
     }
 
 
     @Override
     public void call(List<DebugPresenter.BaseDebugItem> baseDebugItems) {
         this.baseDebugItems = baseDebugItems;
-        changesDetector.newData(this, baseDebugItems, false);
     }
 
     @Override

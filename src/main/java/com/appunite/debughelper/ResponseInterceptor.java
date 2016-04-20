@@ -1,55 +1,48 @@
 package com.appunite.debughelper;
 
-import android.util.Log;
-
 import java.io.IOException;
 
-import javax.inject.Singleton;
+import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-@Singleton
 public class ResponseInterceptor implements Interceptor
 {
-    private static int mDelay = 1;
 
-
-    public ResponseInterceptor() {
-    }
+    private static int RESPONSE_CODE = 200;
 
     @Override
     public Response intercept(Chain chain) throws IOException
     {
-        this.sleep();
-        Log.d("NetworkSlowdown", "Network slowdown done. Proceeding chain");
         Request request = chain.request();
         Response response = chain.proceed(request);
-        String stringJson = response.body().string();
-        MediaType contentType = response.body().contentType();
-        ResponseBody body = ResponseBody.create(contentType, stringJson);
-        return response.newBuilder().body(body).build();
 
-//        return chain.proceed(chain.request());
+//        MediaType contentType = response.body().contentType();
+//        ResponseBody responseBody = ResponseBody.create(contentType, "Response");
+        Response newResponse = response.newBuilder().code(RESPONSE_CODE).body(response.body()).build();
+
+        return handleError(newResponse);
     }
 
-    /**
-     * Sleep the thread 10 seconds to slow the request.
-     */
-    private void sleep()
-    {
-        try {
-            Log.d("NetworkSlowdown", "Sleeping for 10 seconds");
-            Thread.sleep(mDelay);
-        } catch (InterruptedException e) {
-            Log.e("NetworkSlowdown", "Interrupted", e);
+    @Nonnull
+    public Response handleError(Response response) throws IOException {
+        if (response.isSuccessful()) {
+            return response;
         }
+        final int statusCode = response.code();
+        if (statusCode < 200) {
+            return response;
+        }
+
+        throw new IOException("exception code " + response.code());
     }
 
-    public void setDelay(int delay) {
-        mDelay = delay;
+
+
+
+    public static void setResponseCode(int responseCode) {
+        RESPONSE_CODE = responseCode;
     }
 }

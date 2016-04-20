@@ -1,13 +1,12 @@
 package com.appunite.debughelper;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
-
-public abstract class DebugActivity extends RxAppCompatActivity {
+public abstract class DebugActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

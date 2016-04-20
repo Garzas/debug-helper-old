@@ -23,7 +23,6 @@ import rx.functions.Action1;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 
-//@Singleton
 public class DebugHelper {
 
 
@@ -31,40 +30,37 @@ public class DebugHelper {
         return true;
     }
 
-    private Activity activity;
-    private SerialSubscription subscription = new SerialSubscription();
-    private DelayInterceptor delayInterceptor;
-    final DebugPresenter debugPresenter;
-    DebugDrawerPreferences debugPreferences;
+    private static Activity mActivity;
+    private static SerialSubscription subscription = new SerialSubscription();
+    private static DebugPresenter debugPresenter = null;
+    static DebugDrawerPreferences debugPreferences;
 
-    public DebugHelper(Activity activity) {
-        this.activity = activity;
-        delayInterceptor = new DelayInterceptor();
-        debugPreferences = new DebugDrawerPreferences(activity.getApplicationContext());
-        debugPresenter = new DebugPresenter(activity);
+    public static void setActivity(Activity activity) {
+        mActivity = activity;
+        debugPreferences = new DebugDrawerPreferences(mActivity.getApplicationContext());
+        debugPresenter = new DebugPresenter(mActivity);
         if (debugPreferences.getLeakCanaryState()) {
-            LeakCanary.install(activity.getApplication());
+            LeakCanary.install(mActivity.getApplication());
         }
-
-
     }
 
+
     @Nonnull
-    public View setContentView(int childId) {
-        final View child = activity.getLayoutInflater().inflate(childId, null);
+    public static View setContentView(int childId) {
+        final View child = mActivity.getLayoutInflater().inflate(childId, null);
         return setContentView(child);
     }
 
     @Nonnull
-    public View setContentView(@Nonnull View child) {
-        final View root = activity.getLayoutInflater().inflate(R.layout.debug_layout, null);
+    public static View setContentView(@Nonnull View child) {
+        final View root = mActivity.getLayoutInflater().inflate(R.layout.debug_layout, null);
         final ViewGroup mainFrame = (ViewGroup) root.findViewById(R.id.main_frame);
         mainFrame.removeAllViews();
         mainFrame.addView(child);
         final ScalpelFrameLayout scalpelFrame = (ScalpelFrameLayout) mainFrame;
         final DebugAdapter debugAdapter = new DebugAdapter(debugPreferences);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
 
         RecyclerView debugRecyclerView = (RecyclerView) root.findViewById(R.id.debug_drawer);
         debugRecyclerView.setBackgroundColor(Color.parseColor("#cc222222"));
@@ -73,25 +69,17 @@ public class DebugHelper {
         debugRecyclerView.setAdapter(debugAdapter);
 
         final DisplayMetrics metrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         subscription.set(Subscriptions.from(
                 debugPresenter.simpleListObservable()
                         .subscribe(debugAdapter),
 
-                Observable.just(activity.getResources().getDisplayMetrics().density * 160f)
+                Observable.just(mActivity.getResources().getDisplayMetrics().density * 160f)
                         .subscribe(debugPresenter.densityObserver()),
 
                 Observable.just(metrics.widthPixels + "x" + metrics.heightPixels)
                         .subscribe(debugPresenter.resolutionObserver()),
-
-                debugPresenter.getDelayObservable()
-                        .subscribe(new Action1<Integer>() {
-                            @Override
-                            public void call(Integer integer) {
-                                delayInterceptor.setDelay(integer);
-                            }
-                        }),
 
                 debugPresenter.setScalpelObservable()
                         .subscribe(new Action1<Boolean>() {
@@ -122,10 +110,10 @@ public class DebugHelper {
                             @Override
                             public void call(Boolean isSet) {
                                 if (isSet) {
-                                    TinyDancer.create().show(activity.getApplicationContext());
+                                    TinyDancer.create().show(mActivity.getApplicationContext());
                                 } else {
-                                    TinyDancer.create().show(activity.getApplicationContext());
-                                    TinyDancer.hide(activity.getApplicationContext());
+                                    TinyDancer.create().show(mActivity.getApplicationContext());
+                                    TinyDancer.hide(mActivity.getApplicationContext());
                                 }
                             }
                         }),
@@ -136,8 +124,8 @@ public class DebugHelper {
                             public void call(Object o) {
                                 LynxConfig lynxConfig = new LynxConfig();
                                 lynxConfig.setMaxNumberOfTracesToShow(4000);
-                                Intent lynxActivityIntent = LynxActivity.getIntent(activity, lynxConfig);
-                                activity.startActivity(lynxActivityIntent);
+                                Intent lynxActivityIntent = LynxActivity.getIntent(mActivity, lynxConfig);
+                                mActivity.startActivity(lynxActivityIntent);
                             }
                         }),
 
@@ -146,37 +134,29 @@ public class DebugHelper {
                             @Override
                             public void call(Boolean isSet) {
                                 debugPreferences.saveLeakCanaryState(isSet);
-                                activity.recreate();
+                                mActivity.recreate();
                                 //TODO disable leakcannary for all activities
                             }
                         })
 
 
         ));
+
         return root;
     }
 
-    public void onDestroy() {
+    public static void onDestroy() {
         subscription.set(Subscriptions.empty());
     }
 
-    public void onResume() {
-        TinyDancer.create().show(activity.getApplicationContext());
-        TinyDancer.hide(activity.getApplicationContext());
+    public static void onResume() {
+        TinyDancer.create().show(mActivity.getApplicationContext());
+        TinyDancer.hide(mActivity.getApplicationContext());
     }
 
     @Nonnull
-    public Interceptor getDelayInterceptor(Interceptor interceptor) {
-//        if (BuildConfig.DEBUG || interceptor == null) {
-        return getDelayInterceptor();
-//        }
-//        else {
-//            return interceptor;
-//        }
-
+    public static Interceptor getDelayInterceptor() {
+        return new ResponseInterceptor();
     }
 
-    public DelayInterceptor getDelayInterceptor() {
-        return delayInterceptor;
-    }
 }
