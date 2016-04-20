@@ -297,7 +297,7 @@ public class DebugPresenter {
                                         Build.VERSION.SDK_INT)
                                         + "(" + Build.VERSION.SDK_INT
                                         + " API)"),
-                                new InformationItem("Relase", Build.VERSION.RELEASE),
+                                new InformationItem("Release", Build.VERSION.RELEASE),
                                 new InformationItem("Resolution", resolution),
                                 new InformationItem("Density", Math.round(density) + "dpi"));
                     }
@@ -359,6 +359,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
+                                .add(new SpinnerItem("Http code", ImmutableList.of(200, 201, 202, 400, 401, 403, 404, 500, 502, 503, 504)))
                                 .add(new SpinnerItem("Delay[ms]", ImmutableList.of(100, 500, 1000, 2000, 10000)))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
