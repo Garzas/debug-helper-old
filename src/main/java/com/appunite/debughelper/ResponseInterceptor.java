@@ -12,6 +12,7 @@ public class ResponseInterceptor implements Interceptor
 {
 
     private static int RESPONSE_CODE = 200;
+    private static boolean nullBody = false;
 
     @Override
     public Response intercept(Chain chain) throws IOException
@@ -44,5 +45,9 @@ public class ResponseInterceptor implements Interceptor
 
     public static void setResponseCode(int responseCode) {
         RESPONSE_CODE = responseCode;
+    }
+
+    public static void setNullBody(boolean nullBody) {
+        ResponseInterceptor.nullBody = nullBody;
     }
 }

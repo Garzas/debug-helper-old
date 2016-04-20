@@ -33,11 +33,11 @@ public class DebugHelper {
     private static Activity mActivity;
     private static SerialSubscription subscription = new SerialSubscription();
     private static DebugPresenter debugPresenter = null;
-    static DebugDrawerPreferences debugPreferences;
+    static DebugHelperPreferences debugPreferences;
 
     public static void setActivity(Activity activity) {
         mActivity = activity;
-        debugPreferences = new DebugDrawerPreferences(mActivity.getApplicationContext());
+        debugPreferences = new DebugHelperPreferences(mActivity.getApplicationContext());
         debugPresenter = new DebugPresenter(mActivity);
         if (debugPreferences.getLeakCanaryState()) {
             LeakCanary.install(mActivity.getApplication());

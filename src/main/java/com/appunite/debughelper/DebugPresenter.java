@@ -293,7 +293,7 @@ public class DebugPresenter {
                     public List<InformationItem> call(String resolution, Float density) {
                         return ImmutableList.of(
                                 new InformationItem("Model", Build.MANUFACTURER + " " + Build.MODEL),
-                                new InformationItem("SDK", DebugDrawerUtils.checkSDKNamme(
+                                new InformationItem("SDK", DebugTools.checkSDKNamme(
                                         Build.VERSION.SDK_INT)
                                         + "(" + Build.VERSION.SDK_INT
                                         + " API)"),
@@ -308,10 +308,10 @@ public class DebugPresenter {
                     @Override
                     public List<InformationItem> call(Float density) {
                         return ImmutableList.of(
-                                new InformationItem("Name", DebugDrawerUtils.getApplicationName(context)),
+                                new InformationItem("Name", DebugTools.getApplicationName(context)),
                                 new InformationItem("Package", context.getPackageName()),
-                                new InformationItem("Build Type", DebugDrawerUtils.getBuildType(context)),
-                                new InformationItem("Version", DebugDrawerUtils.getBuildVersion(context))
+                                new InformationItem("Build Type", DebugTools.getBuildType(context)),
+                                new InformationItem("Version", DebugTools.getBuildVersion(context))
                         );
 
                     }

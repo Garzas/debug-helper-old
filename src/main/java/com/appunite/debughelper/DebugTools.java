@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-public class DebugDrawerUtils {
-
+public class DebugTools {
 
     public static String checkSDKNamme(int sdkInt) {
         switch (sdkInt) {
@@ -26,7 +25,7 @@ public class DebugDrawerUtils {
             case Build.VERSION_CODES.ECLAIR_MR1: // API level 8
                 return  "Eclair MR1";
             case Build.VERSION_CODES.FROYO: // API level 9
-                return  "Froyoooo";
+                return  "Froyo";
             case Build.VERSION_CODES.GINGERBREAD: // API level 10
                 return "Gingerbread";
             case Build.VERSION_CODES.GINGERBREAD_MR1: // API level 11
@@ -34,7 +33,7 @@ public class DebugDrawerUtils {
             case Build.VERSION_CODES.HONEYCOMB: // API level 12
                 return "Honeycomb";
             case Build.VERSION_CODES.HONEYCOMB_MR1: // API level 13
-                return "Homecomb MR1";
+                return "Honeycomb MR1";
             case Build.VERSION_CODES.HONEYCOMB_MR2:
                 return "Honeycomb MR2";
             case Build.VERSION_CODES.ICE_CREAM_SANDWICH: // API level 14
@@ -52,9 +51,9 @@ public class DebugDrawerUtils {
             case Build.VERSION_CODES.KITKAT_WATCH: //API 20
                 return  "Kitkat Watch";
             case Build.VERSION_CODES.LOLLIPOP: //API 21
-                return "Lolipop";
+                return "Lollipop";
             case Build.VERSION_CODES.LOLLIPOP_MR1: //API 22
-                return "Lolipop MR1";
+                return "Lollipop MR1";
             case 23:
                 return "Marshmallow";
             default:
@@ -66,7 +65,7 @@ public class DebugDrawerUtils {
         try {
             String version = context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName;
             version = version.replace(".debug","");
-            version = version.replace(".relase", "");
+            version = version.replace(".release", "");
 
             return version;
         } catch (PackageManager.NameNotFoundException e) {
@@ -81,8 +80,8 @@ public class DebugDrawerUtils {
             if(version.contains("debug")) {
                 return "debug";
             }
-            else if (version.contains(".relase")) {
-               return "relase";
+            else if (version.contains(".release")) {
+               return "release";
             }
             else {
                 return "Unknown";

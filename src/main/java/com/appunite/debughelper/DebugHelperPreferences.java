@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import javax.annotation.Nonnull;
 
-public class DebugDrawerPreferences {
+public class DebugHelperPreferences {
 
     private static final String DEBUG_DRAWER_PREFS = "debug_drawer_prefs";
     private static final String LEAK_CANARY_STATE = "cannary_state";
@@ -13,7 +13,7 @@ public class DebugDrawerPreferences {
     @Nonnull
     private final SharedPreferences sharedPreferences;
 
-    public DebugDrawerPreferences(@Nonnull Context context) {
+    public DebugHelperPreferences(@Nonnull Context context) {
         sharedPreferences = context.getSharedPreferences(DEBUG_DRAWER_PREFS, 0);
     }
 

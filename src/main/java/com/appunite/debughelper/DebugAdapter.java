@@ -156,13 +156,13 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     static class SwitchHolder extends BaseDebugHolder {
 
         private final View view;
-        private DebugDrawerPreferences debugPreferences;
+        private DebugHelperPreferences debugPreferences;
         private Subscription mSubscription;
 
         Switch debugSwitch;
         TextView title;
 
-        public SwitchHolder(View itemView, DebugDrawerPreferences debugPreferences) {
+        public SwitchHolder(View itemView, DebugHelperPreferences debugPreferences) {
             super(itemView);
             this.view = itemView;
             this.debugPreferences = debugPreferences;
@@ -200,7 +200,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             }
         }
 
-        public static SwitchHolder create(ViewGroup parent, DebugDrawerPreferences debugPreferences) {
+        public static SwitchHolder create(ViewGroup parent, DebugHelperPreferences debugPreferences) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new SwitchHolder(inflater.inflate(R.layout.debug_switch_item, parent, false), debugPreferences);
         }
@@ -260,10 +260,10 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     @Nonnull
     private List<DebugPresenter.BaseDebugItem> baseDebugItems = ImmutableList.of();
 
-    private DebugDrawerPreferences debugPreferences;
+    private DebugHelperPreferences debugPreferences;
 
 
-    public DebugAdapter(DebugDrawerPreferences debugPreferences) {
+    public DebugAdapter(DebugHelperPreferences debugPreferences) {
         this.debugPreferences = debugPreferences;
     }
 
