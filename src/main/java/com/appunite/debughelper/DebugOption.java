@@ -1,6 +1,6 @@
 package com.appunite.debughelper;
 
-public class DebugSwitch {
+public class DebugOption {
 
     public static final int SET_SCALPEL = 0;
     public static final int SCALPEL_DRAW_VIEWS = 1;
@@ -8,5 +8,7 @@ public class DebugSwitch {
     public static final int FPS_LABEL = 3;
     public static final int SHOW_LOG = 4;
     public static final int LEAK_CANARY = 5;
+    public static final int SET_DELAY = 6;
+    public static final int SET_HTTP_CODE = 7;
 
 }

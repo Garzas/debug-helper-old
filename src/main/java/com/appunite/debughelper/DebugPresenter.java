@@ -25,7 +25,7 @@ import rx.subjects.PublishSubject;
 public class DebugPresenter {
 
     @Nonnull
-    private final PublishSubject<Integer> delaySubject = PublishSubject.create();
+    private final PublishSubject<SelectOption> selectSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<SwitchOption> optionSubject = PublishSubject.create();
     @Nonnull
@@ -58,6 +58,10 @@ public class DebugPresenter {
     private final PublishSubject<String> resolutionSubject = PublishSubject.create();
     @Nonnull
     private final Context context;
+    @Nonnull
+    private final Observable<Integer> delayObservable;
+    @Nonnull
+    private final Observable<Integer> httpCodeObservable;
 
 
     public abstract static class BaseDebugItem {
@@ -141,10 +145,13 @@ public class DebugPresenter {
         @Nonnull
         private final String name;
         @Nonnull
+        private final int option;
+        @Nonnull
         private final List<Integer> values;
 
-        public SpinnerItem(@Nonnull String name, @Nonnull List<Integer> values) {
+        public SpinnerItem(@Nonnull String name, @Nonnull int option, @Nonnull List<Integer> values) {
             this.name = name;
+            this.option = option;
             this.values = values;
         }
 
@@ -156,6 +163,11 @@ public class DebugPresenter {
         @Nonnull
         public List<Integer> getValues() {
             return values;
+        }
+
+        @Nonnull
+        public int getOption() {
+            return option;
         }
 
         @Override
@@ -179,8 +191,8 @@ public class DebugPresenter {
         public Observer<Integer> clickObserver() {
             return Observers.create(new Action1<Integer>() {
                 @Override
-                public void call(Integer delay) {
-                    delaySubject.onNext(delay);
+                public void call(Integer value) {
+                    selectSubject.onNext(new SelectOption(value, option));
                 }
             });
         }
@@ -322,9 +334,9 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("Turn Scalpel ", DebugSwitch.SET_SCALPEL),
-                                new SwitchItem("Draw Views", DebugSwitch.SCALPEL_DRAW_VIEWS),
-                                new SwitchItem("Show Ids", DebugSwitch.SCALPEL_SHOW_ID));
+                                new SwitchItem("Turn Scalpel ", DebugOption.SET_SCALPEL),
+                                new SwitchItem("Draw Views", DebugOption.SCALPEL_DRAW_VIEWS),
+                                new SwitchItem("Show Ids", DebugOption.SCALPEL_SHOW_ID));
                     }
                 });
 
@@ -333,9 +345,9 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("FPS Label", DebugSwitch.FPS_LABEL),
-                                new SwitchItem("LeakCanary", DebugSwitch.LEAK_CANARY),
-                                new ActionItem("Show Log", DebugSwitch.SHOW_LOG));
+                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL),
+                                new SwitchItem("LeakCanary", DebugOption.LEAK_CANARY),
+                                new ActionItem("Show Log", DebugOption.SHOW_LOG));
                     }
                 });
 
@@ -359,8 +371,8 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
-                                .add(new SpinnerItem("Http code", ImmutableList.of(200, 201, 202, 400, 401, 403, 404, 500, 502, 503, 504)))
-                                .add(new SpinnerItem("Delay[ms]", ImmutableList.of(100, 500, 1000, 2000, 10000)))
+                                .add(new SpinnerItem("Http code", DebugOption.SET_HTTP_CODE, ImmutableList.of(200, 201, 202, 400, 401, 403, 404, 500, 502, 503, 504)))
+                                .add(new SpinnerItem("Delay[ms]", DebugOption.SET_DELAY, ImmutableList.of(100, 500, 1000, 2000, 10000)))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
@@ -376,7 +388,7 @@ public class DebugPresenter {
                .filter(new Func1<SwitchOption, Boolean>() {
                    @Override
                    public Boolean call(SwitchOption switchOption) {
-                       return switchOption.getOption() == DebugSwitch.SET_SCALPEL;
+                       return switchOption.getOption() == DebugOption.SET_SCALPEL;
                    }
                })
                 .map(checkSet());
@@ -385,7 +397,7 @@ public class DebugPresenter {
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
-                        return switchOption.getOption() == DebugSwitch.SCALPEL_DRAW_VIEWS;
+                        return switchOption.getOption() == DebugOption.SCALPEL_DRAW_VIEWS;
                     }
                 })
                 .map(checkSet());
@@ -394,7 +406,7 @@ public class DebugPresenter {
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
-                        return switchOption.getOption() == DebugSwitch.SCALPEL_SHOW_ID;
+                        return switchOption.getOption() == DebugOption.SCALPEL_SHOW_ID;
                     }
                 })
                 .map(checkSet());
@@ -403,7 +415,7 @@ public class DebugPresenter {
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
-                        return switchOption.getOption() == DebugSwitch.FPS_LABEL;
+                        return switchOption.getOption() == DebugOption.FPS_LABEL;
                     }
                 })
                 .map(checkSet());
@@ -412,7 +424,7 @@ public class DebugPresenter {
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
-                        return switchOption.getOption() == DebugSwitch.LEAK_CANARY;
+                        return switchOption.getOption() == DebugOption.LEAK_CANARY;
                     }
                 })
                 .map(checkSet());
@@ -421,7 +433,7 @@ public class DebugPresenter {
                 .filter(new Func1<Integer, Boolean>() {
                     @Override
                     public Boolean call(Integer integer) {
-                        return integer.equals(DebugSwitch.SHOW_LOG);
+                        return integer.equals(DebugOption.SHOW_LOG);
                     }
                 })
                 .map(new Func1<Integer, String>() {
@@ -431,7 +443,34 @@ public class DebugPresenter {
                     }
                 });
 
+        delayObservable = selectSubject
+                .filter(new Func1<SelectOption, Boolean>() {
+                    @Override
+                    public Boolean call(SelectOption selectOption) {
+                        return selectOption.getOption() == DebugOption.SET_DELAY;
+                    }
+                })
+                .map(selectValue());
 
+        httpCodeObservable = selectSubject
+                .filter(new Func1<SelectOption, Boolean>() {
+                    @Override
+                    public Boolean call(SelectOption selectOption) {
+                        return selectOption.getOption() == DebugOption.SET_HTTP_CODE;
+                    }
+                })
+                .map(selectValue());
+
+
+    }
+
+    private Func1<SelectOption, Integer> selectValue() {
+        return new Func1<SelectOption, Integer>() {
+            @Override
+            public Integer call(SelectOption selectOption) {
+                return selectOption.getValue();
+            }
+        };
     }
 
     @Nonnull
@@ -457,7 +496,7 @@ public class DebugPresenter {
 
     @Nonnull
     public Observable<Integer> getDelayObservable() {
-        return delaySubject;
+        return delayObservable;
     }
 
     @Nonnull
@@ -495,4 +534,8 @@ public class DebugPresenter {
         return showIdObservable;
     }
 
+    @Nonnull
+    public Observable<Integer> getHttpCodeObservable() {
+        return httpCodeObservable;
+    }
 }

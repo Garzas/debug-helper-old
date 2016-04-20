@@ -181,7 +181,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
                             .filter(new Func1<Boolean, Boolean>() {
                                 @Override
                                 public Boolean call(Boolean o) {
-                                    return switchItem.getOption() == DebugSwitch.LEAK_CANARY;
+                                    return switchItem.getOption() == DebugOption.LEAK_CANARY;
                                 }
                             })
                             .subscribe(RxCompoundButton.checked(debugSwitch)),

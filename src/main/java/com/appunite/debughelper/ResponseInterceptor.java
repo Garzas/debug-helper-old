@@ -11,7 +11,7 @@ import okhttp3.Response;
 public class ResponseInterceptor implements Interceptor
 {
 
-    private static int RESPONSE_CODE = 200;
+    private static int responseCode = 200;
     private static boolean nullBody = false;
 
     @Override
@@ -22,7 +22,7 @@ public class ResponseInterceptor implements Interceptor
 
 //        MediaType contentType = response.body().contentType();
 //        ResponseBody responseBody = ResponseBody.create(contentType, "Response");
-        Response newResponse = response.newBuilder().code(RESPONSE_CODE).body(response.body()).build();
+        Response newResponse = response.newBuilder().code(responseCode).body(response.body()).build();
 
         return handleError(newResponse);
     }
@@ -44,7 +44,7 @@ public class ResponseInterceptor implements Interceptor
 
 
     public static void setResponseCode(int responseCode) {
-        RESPONSE_CODE = responseCode;
+        ResponseInterceptor.responseCode = responseCode;
     }
 
     public static void setNullBody(boolean nullBody) {
