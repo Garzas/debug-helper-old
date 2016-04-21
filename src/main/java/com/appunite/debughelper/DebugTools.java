@@ -4,6 +4,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import com.google.common.collect.ImmutableList;
+
+import org.apache.http.params.HttpConnectionParams;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import okhttp3.HttpUrl;
+
 public class DebugTools {
 
     public static String checkSDKNamme(int sdkInt) {
@@ -13,7 +21,7 @@ public class DebugTools {
             case Build.VERSION_CODES.BASE_1_1: // API level 2
                 return "Base update";
             case Build.VERSION_CODES.CUPCAKE: // API level 3
-                return  "Cupcake";
+                return "Cupcake";
             case Build.VERSION_CODES.CUR_DEVELOPMENT: // API level 4
                 return "Cur development";
             case Build.VERSION_CODES.DONUT: // API level 5
@@ -23,13 +31,13 @@ public class DebugTools {
             case Build.VERSION_CODES.ECLAIR_0_1: // API level 7
                 return "Eclair 0 1";
             case Build.VERSION_CODES.ECLAIR_MR1: // API level 8
-                return  "Eclair MR1";
+                return "Eclair MR1";
             case Build.VERSION_CODES.FROYO: // API level 9
-                return  "Froyo";
+                return "Froyo";
             case Build.VERSION_CODES.GINGERBREAD: // API level 10
                 return "Gingerbread";
             case Build.VERSION_CODES.GINGERBREAD_MR1: // API level 11
-                return  "Gingerbread MR1";
+                return "Gingerbread MR1";
             case Build.VERSION_CODES.HONEYCOMB: // API level 12
                 return "Honeycomb";
             case Build.VERSION_CODES.HONEYCOMB_MR1: // API level 13
@@ -39,17 +47,17 @@ public class DebugTools {
             case Build.VERSION_CODES.ICE_CREAM_SANDWICH: // API level 14
                 return "Ice Cream Sandwich";
             case Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1: // API level 15
-                return  "Ice Cream Sandwich MR1";
+                return "Ice Cream Sandwich MR1";
             case Build.VERSION_CODES.JELLY_BEAN: // API level 16
-                return  "Jelly Bean";
+                return "Jelly Bean";
             case Build.VERSION_CODES.JELLY_BEAN_MR1: // API level 17
-                return  "Jelly Bean MR1";
+                return "Jelly Bean MR1";
             case Build.VERSION_CODES.JELLY_BEAN_MR2: // API level 18
                 return "Jelly Bean MR2";
             case Build.VERSION_CODES.KITKAT: // API level 19
-                return  "Kitkat";
+                return "Kitkat";
             case Build.VERSION_CODES.KITKAT_WATCH: //API 20
-                return  "Kitkat Watch";
+                return "Kitkat Watch";
             case Build.VERSION_CODES.LOLLIPOP: //API 21
                 return "Lollipop";
             case Build.VERSION_CODES.LOLLIPOP_MR1: //API 22
@@ -61,10 +69,192 @@ public class DebugTools {
         }
     }
 
+    public static int selectHttpCodePosition(int code) {
+        switch (code) {
+            /**
+             * Numeric status code, 200: OK
+             */
+            case HttpsURLConnection.HTTP_OK:
+                return 0;
+            /**
+             * Numeric status code, 201: Created
+             */
+            case HttpsURLConnection.HTTP_CREATED:
+                return 1;
+            /**
+             * Numeric status code, 202: Accepted
+             */
+            case HttpsURLConnection.HTTP_ACCEPTED:
+                return 2;
+            /**
+             * Numeric status code, 203: Not authoritative
+             */
+            case HttpsURLConnection.HTTP_NOT_AUTHORITATIVE:
+                return 3;
+            /**
+             * Numeric status code, 204: No content
+             */
+            case HttpsURLConnection.HTTP_NO_CONTENT:
+                return 4;
+            /**
+             * Numeric status code, 205: Reset
+             */
+            case HttpsURLConnection.HTTP_RESET:
+                return 5;
+            /**
+             * Numeric status code, 206: Partial
+             */
+            case HttpsURLConnection.HTTP_PARTIAL:
+                return 6;
+            /**
+             * Numeric status code, 300: Multiple choices
+             */
+            case HttpsURLConnection.HTTP_MULT_CHOICE:
+                return 7;
+            /**
+             * Numeric status code, 301 Moved permanently
+             */
+            case HttpsURLConnection.HTTP_MOVED_PERM:
+                return 8;
+            /**
+             * Numeric status code, 302: Moved temporarily
+             */
+            case HttpsURLConnection.HTTP_MOVED_TEMP:
+                return 9;
+            /**
+             * Numeric status code, 303: See other
+             */
+            case HttpsURLConnection.HTTP_SEE_OTHER:
+                return 10;
+            /**
+             * Numeric status code, 304: Not modified
+             */
+            case HttpsURLConnection.HTTP_NOT_MODIFIED:
+                return 11;
+            /**
+             * Numeric status code, 305: Use proxy.
+             */
+            case HttpsURLConnection.HTTP_USE_PROXY:
+                return 12;
+            /**
+             * Numeric status code, 400: Bad Request
+             */
+            case HttpsURLConnection.HTTP_BAD_REQUEST:
+                return 13;
+            /**
+             * Numeric status code, 401: Unauthorized
+             */
+            case HttpsURLConnection.HTTP_UNAUTHORIZED:
+                return 14;
+            /**
+             * Numeric status code, 402: Payment required
+             */
+            case HttpsURLConnection.HTTP_PAYMENT_REQUIRED:
+                return 15;
+            /**
+             * Numeric status code, 403: Forbidden
+             */
+            case HttpsURLConnection.HTTP_FORBIDDEN:
+                return 16;
+            /**
+             * Numeric status code, 404: Not found
+             */
+            case HttpsURLConnection.HTTP_NOT_FOUND:
+                return 17;
+            /**
+             * Numeric status code, 405: Bad Method
+             */
+            case HttpsURLConnection.HTTP_BAD_METHOD:
+                return 18;
+            /**
+             * Numeric status code, 406: Not acceptable
+             */
+            case HttpsURLConnection.HTTP_NOT_ACCEPTABLE:
+                return 19;
+            /**
+             * Numeric status code, 407: Proxy authentication required
+             */
+            case HttpsURLConnection.HTTP_PROXY_AUTH:
+                return 20;
+            /**
+             * Numeric status code, 408: Client Timeout
+             */
+            case HttpsURLConnection.HTTP_CLIENT_TIMEOUT:
+                return 21;
+            /**
+             * Numeric status code, 409: Conflict
+             */
+            case HttpsURLConnection.HTTP_CONFLICT:
+                return 22;
+            /**
+             * Numeric status code, 410: Gone
+             */
+            case HttpsURLConnection.HTTP_GONE:
+                return 23;
+            /**
+             * Numeric status code, 411: Length required
+             */
+            case HttpsURLConnection.HTTP_LENGTH_REQUIRED:
+                return 24;
+            /**
+             * Numeric status code, 412: Precondition failed
+             */
+            case HttpsURLConnection.HTTP_PRECON_FAILED:
+                return 25;
+            /**
+             * Numeric status code, 413: Entity too large
+             */
+            case HttpsURLConnection.HTTP_ENTITY_TOO_LARGE:
+                return 26;
+            /**
+             * Numeric status code, 414: Request too long
+             */
+            case HttpsURLConnection.HTTP_REQ_TOO_LONG:
+                return 27;
+            /**
+             * Numeric status code, 415: Unsupported type
+             */
+            case HttpsURLConnection.HTTP_UNSUPPORTED_TYPE:
+                return 28;
+            /**
+             * Numeric status code, 500: Internal error
+             */
+            case HttpsURLConnection.HTTP_INTERNAL_ERROR:
+                return 29;
+            /**
+             * Numeric status code, 501: Not implemented
+             */
+            case HttpsURLConnection.HTTP_NOT_IMPLEMENTED:
+                return 30;
+            /**
+             * Numeric status code, 502: Bad Gateway
+             */
+            case HttpsURLConnection.HTTP_BAD_GATEWAY:
+                return 31;
+            /**
+             * Numeric status code, 503: Unavailable
+             */
+            case HttpsURLConnection.HTTP_UNAVAILABLE:
+                return 32;
+            /**
+             * Numeric status code, 504: Gateway timeout
+             */
+            case HttpsURLConnection.HTTP_GATEWAY_TIMEOUT:
+                return 33;
+            /**
+             * Numeric status code, 505: Version not supported
+             */
+            case HttpsURLConnection.HTTP_VERSION:
+                return 34;
+            default:
+                return 0;
+        }
+    }
+
     public static String getBuildVersion(Context context) {
         try {
-            String version = context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName;
-            version = version.replace(".debug","");
+            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            version = version.replace(".debug", "");
             version = version.replace(".release", "");
 
             return version;
@@ -76,14 +266,12 @@ public class DebugTools {
 
     public static String getBuildType(Context context) {
         try {
-            String version = context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName;
-            if(version.contains("debug")) {
+            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            if (version.contains("debug")) {
                 return "debug";
-            }
-            else if (version.contains(".release")) {
-               return "release";
-            }
-            else {
+            } else if (version.contains(".release")) {
+                return "release";
+            } else {
                 return "Unknown";
             }
 
