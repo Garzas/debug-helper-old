@@ -50,4 +50,8 @@ public class ResponseInterceptor implements Interceptor
     public static void setNullBody(boolean nullBody) {
         ResponseInterceptor.nullBody = nullBody;
     }
+
+    public static int getResponseCode() {
+        return responseCode;
+    }
 }
