@@ -137,8 +137,16 @@ public class DebugHelper {
                                 mActivity.recreate();
                                 //TODO disable leakcannary for all activities
                             }
-                        })
+                        }),
 
+                debugPresenter.getHttpCodeObservable()
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer code) {
+                                ResponseInterceptor.setResponseCode(code);
+                                mActivity.recreate();
+                            }
+                        })
 
         ));
 

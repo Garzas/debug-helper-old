@@ -37,7 +37,7 @@ public class ResponseInterceptor implements Interceptor
             return response;
         }
 
-        throw new IOException("exception code " + response.code());
+        throw new IOException("Exception code " + response.code());
     }
 
 

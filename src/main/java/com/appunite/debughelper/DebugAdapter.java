@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxAdapter;
 import com.jakewharton.rxbinding.widget.RxAdapterView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
 
@@ -23,6 +24,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 abstract class BaseDebugHolder extends RecyclerView.ViewHolder {
@@ -123,19 +125,36 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         @Override
         public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
-            DebugPresenter.SpinnerItem spinnerItem = (DebugPresenter.SpinnerItem) item;
+            recycle();
+            final DebugPresenter.SpinnerItem spinnerItem = (DebugPresenter.SpinnerItem) item;
             final ArrayAdapter<Integer> adapter = new ArrayAdapter<>(itemView.getContext(), android.R.layout.simple_list_item_1, spinnerItem.getValues());
 
             spinnerName.setText(spinnerItem.getName());
             spinner.setAdapter(adapter);
-            mSubscription = new CompositeSubscription(RxAdapterView.itemSelections(spinner)
-                    .map(new Func1<Integer, Integer>() {
-                        @Override
-                        public Integer call(Integer pos) {
-                            return adapter.getItem(pos);
-                        }
-                    })
-                    .subscribe(spinnerItem.clickObserver()));
+            mSubscription = new CompositeSubscription(
+                    Observable.just(ResponseInterceptor.getResponseCode())
+                            .filter(new Func1<Integer, Boolean>() {
+                                @Override
+                                public Boolean call(Integer integer) {
+                                    return spinnerItem.getOption() == DebugOption.SET_HTTP_CODE;
+                                }
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .subscribe(new Action1<Integer>() {
+                                @Override
+                                public void call(Integer integer) {
+                                    spinner.setSelection(DebugTools.selectHttpCodePosition(integer));
+                                }
+                            }),
+                    RxAdapterView.itemSelections(spinner)
+                            .map(new Func1<Integer, Integer>() {
+                                @Override
+                                public Integer call(Integer pos) {
+                                    return adapter.getItem(pos);
+                                }
+                            })
+                            .skip(2)
+                            .subscribe(spinnerItem.clickObserver()));
 
         }
 
@@ -172,6 +191,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         @Override
         public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+            recycle();
             final DebugPresenter.SwitchItem switchItem = (DebugPresenter.SwitchItem) item;
 
             title.setText(switchItem.getTitle());
@@ -222,6 +242,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         @Override
         public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+            recycle();
             DebugPresenter.ActionItem actionItem = (DebugPresenter.ActionItem) item;
 
             actionName.setText(actionItem.getName());
@@ -254,7 +275,6 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 //    private final InputMethodManager mKeyboard;
 //    private final Picasso mPicasso;
 //    private final Context mContext;
-
 
 
     @Nonnull
