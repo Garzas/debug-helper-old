@@ -27,7 +27,7 @@ public class DebugPresenter {
     @Nonnull
     private final PublishSubject<SelectOption> selectSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<SwitchOption> optionSubject = PublishSubject.create();
+    private final PublishSubject<SwitchOption> switchOptionSubject = PublishSubject.create();
     @Nonnull
     private final Observable<Boolean> scalpelObservable;
     @Nonnull
@@ -59,9 +59,7 @@ public class DebugPresenter {
     @Nonnull
     private final Context context;
     @Nonnull
-    public Observable<SelectOption> showOptionsDialog() {
-        return selectSubject;
-    }
+    private final PublishSubject<SelectOption> changeOptionSubject = PublishSubject.create();
 
     public abstract static class BaseDebugItem {
     }
@@ -146,13 +144,13 @@ public class DebugPresenter {
         private final int option;
         @Nonnull
         private final List<Integer> values;
-        private int currentValue;
+        private int currentPosition;
 
-        public OptionItem(@Nonnull String name, int option, @Nonnull List<Integer> values, int currentValue) {
+        public OptionItem(@Nonnull String name, int option, @Nonnull List<Integer> values, int currentPosition) {
             this.name = name;
             this.option = option;
             this.values = values;
-            this.currentValue = currentValue;
+            this.currentPosition = currentPosition;
         }
 
         @Nonnull
@@ -169,8 +167,8 @@ public class DebugPresenter {
             return option;
         }
 
-        public int getCurrentValue() {
-            return currentValue;
+        public int getCurrentPosition() {
+            return currentPosition;
         }
 
         @Override
@@ -195,7 +193,7 @@ public class DebugPresenter {
             return Observers.create(new Action1<Object>() {
                 @Override
                 public void call(Object o) {
-                    selectSubject.onNext(new SelectOption(option, currentValue, values));
+                    selectSubject.onNext(new SelectOption(option, currentPosition, values));
                 }
             });
         }
@@ -243,7 +241,7 @@ public class DebugPresenter {
             return Observers.create(new Action1<Boolean>() {
                 @Override
                 public void call(Boolean set) {
-                    optionSubject.onNext(new SwitchOption(set, option));
+                    switchOptionSubject.onNext(new SwitchOption(set, option));
                 }
             });
         }
@@ -382,7 +380,8 @@ public class DebugPresenter {
                                                 403, 404, 405, 406, 407,
                                                 408, 409, 410, 411, 412,
                                                 413, 414, 415, 500, 501,
-                                                502, 503, 504, 505), ResponseInterceptor.getResponseCode()))
+                                                502, 503, 504, 505),
+                                        DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode())))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
@@ -394,7 +393,7 @@ public class DebugPresenter {
                 .subscribe(simpleListSubject);
 
 
-        scalpelObservable = optionSubject
+        scalpelObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
@@ -403,7 +402,7 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
-        drawViewsObservable = optionSubject
+        drawViewsObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
@@ -412,7 +411,7 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
-        showIdObservable = optionSubject
+        showIdObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
@@ -421,7 +420,7 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
-        fpsLabelObservable = optionSubject
+        fpsLabelObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
@@ -430,7 +429,7 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
-        leakCanaryObservable = optionSubject
+        leakCanaryObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
@@ -452,6 +451,18 @@ public class DebugPresenter {
                         return "d";
                     }
                 });
+
+        changeOptionSubject.filter(new Func1<SelectOption, Boolean>() {
+            @Override
+            public Boolean call(SelectOption option) {
+                return option.getOption() == DebugOption.SET_HTTP_CODE;
+            }
+        }).subscribe(new Action1<SelectOption>() {
+            @Override
+            public void call(SelectOption option) {
+                ResponseInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
+            }
+        });
 
     }
 
@@ -509,6 +520,16 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Boolean> setShowIdsObservable() {
         return showIdObservable;
+    }
+
+    @Nonnull
+    public Observable<SelectOption> showOptionsDialog() {
+        return selectSubject;
+    }
+
+    @Nonnull
+    public Observer<SelectOption> optionObserver() {
+        return changeOptionSubject;
     }
 
 }

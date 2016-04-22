@@ -166,4 +166,8 @@ public class DebugHelper {
         return new ResponseInterceptor();
     }
 
+    public static void updateOption(SelectOption option) {
+        debugPresenter.optionObserver().onNext(option);
+        mActivity.recreate();
+    }
 }

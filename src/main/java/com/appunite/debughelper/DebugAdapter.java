@@ -124,7 +124,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             recycle();
             final DebugPresenter.OptionItem optionItem = (DebugPresenter.OptionItem) item;
 
-            button.setText(String.format("%d", optionItem.getCurrentValue()));
+            button.setText(String.format("%d", ResponseInterceptor.getResponseCode()));
             optionName.setText(optionItem.getName());
             mSubscription = new CompositeSubscription(
                     RxView.clicks(button).subscribe(optionItem.clickObserver()));

@@ -46,6 +46,6 @@ public abstract class DebugActivity extends AppCompatActivity implements Options
 
     @Override
     public void onSelectOption(SelectOption option) {
-
+        DebugHelper.updateOption(option);
     }
 }

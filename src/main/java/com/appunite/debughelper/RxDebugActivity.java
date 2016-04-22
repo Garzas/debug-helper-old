@@ -47,6 +47,6 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Opt
 
     @Override
     public void onSelectOption(SelectOption option) {
-
+        DebugHelper.updateOption(option);
     }
 }
