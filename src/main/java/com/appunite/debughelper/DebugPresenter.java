@@ -59,10 +59,9 @@ public class DebugPresenter {
     @Nonnull
     private final Context context;
     @Nonnull
-    private final Observable<Integer> delayObservable;
-    @Nonnull
-    private final Observable<Integer> httpCodeObservable;
-
+    public Observable<SelectOption> showOptionsDialog() {
+        return selectSubject;
+    }
 
     public abstract static class BaseDebugItem {
     }
@@ -140,19 +139,20 @@ public class DebugPresenter {
         }
     }
 
-    public class SpinnerItem extends BaseDebugItem {
+    public class OptionItem extends BaseDebugItem {
 
         @Nonnull
         private final String name;
-        @Nonnull
         private final int option;
         @Nonnull
         private final List<Integer> values;
+        private int currentValue;
 
-        public SpinnerItem(@Nonnull String name, @Nonnull int option, @Nonnull List<Integer> values) {
+        public OptionItem(@Nonnull String name, int option, @Nonnull List<Integer> values, int currentValue) {
             this.name = name;
             this.option = option;
             this.values = values;
+            this.currentValue = currentValue;
         }
 
         @Nonnull
@@ -165,9 +165,12 @@ public class DebugPresenter {
             return values;
         }
 
-        @Nonnull
         public int getOption() {
             return option;
+        }
+
+        public int getCurrentValue() {
+            return currentValue;
         }
 
         @Override
@@ -175,10 +178,10 @@ public class DebugPresenter {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof SpinnerItem)) {
+            if (!(o instanceof OptionItem)) {
                 return false;
             }
-            SpinnerItem that = (SpinnerItem) o;
+            OptionItem that = (OptionItem) o;
             return Objects.equal(name, that.name)
                     && Objects.equal(values, that.values);
         }
@@ -188,11 +191,11 @@ public class DebugPresenter {
             return Objects.hashCode(name, values);
         }
 
-        public Observer<Integer> clickObserver() {
-            return Observers.create(new Action1<Integer>() {
+        public Observer<Object> clickObserver() {
+            return Observers.create(new Action1<Object>() {
                 @Override
-                public void call(Integer value) {
-                    selectSubject.onNext(new SelectOption(value, option));
+                public void call(Object o) {
+                    selectSubject.onNext(new SelectOption(option, currentValue, values));
                 }
             });
         }
@@ -294,7 +297,7 @@ public class DebugPresenter {
         }
     }
 
-    public DebugPresenter(final Context context) {
+    public DebugPresenter(@Nonnull final Context context) {
         this.context = context;
 
         deviceInfoList = Observable.combineLatest(
@@ -371,7 +374,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
-                                .add(new SpinnerItem("Http code", DebugOption.SET_HTTP_CODE,
+                                .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
                                         ImmutableList.of(200,
                                                 201, 202, 203, 204, 205,
                                                 206, 300, 301, 302, 303,
@@ -379,8 +382,7 @@ public class DebugPresenter {
                                                 403, 404, 405, 406, 407,
                                                 408, 409, 410, 411, 412,
                                                 413, 414, 415, 500, 501,
-                                                502, 503, 504, 505)))
-                                .add(new SpinnerItem("Delay[ms]", DebugOption.SET_DELAY, ImmutableList.of(100, 500, 1000, 2000, 10000)))
+                                                502, 503, 504, 505), ResponseInterceptor.getResponseCode()))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
@@ -451,35 +453,6 @@ public class DebugPresenter {
                     }
                 });
 
-        delayObservable = selectSubject
-                .filter(new Func1<SelectOption, Boolean>() {
-                    @Override
-                    public Boolean call(SelectOption selectOption) {
-                        return selectOption.getOption() == DebugOption.SET_DELAY;
-                    }
-                })
-//                .distinctUntilChanged()
-                .map(selectValue());
-
-        httpCodeObservable = selectSubject
-                .filter(new Func1<SelectOption, Boolean>() {
-                    @Override
-                    public Boolean call(SelectOption selectOption) {
-                        return selectOption.getOption() == DebugOption.SET_HTTP_CODE;
-                    }
-                })
-                .map(selectValue());
-
-
-    }
-
-    private Func1<SelectOption, Integer> selectValue() {
-        return new Func1<SelectOption, Integer>() {
-            @Override
-            public Integer call(SelectOption selectOption) {
-                return selectOption.getValue();
-            }
-        };
     }
 
     @Nonnull
@@ -501,11 +474,6 @@ public class DebugPresenter {
     @Nonnull
     public Observer<Float> densityObserver() {
         return densitySubject;
-    }
-
-    @Nonnull
-    public Observable<Integer> getDelayObservable() {
-        return delayObservable;
     }
 
     @Nonnull
@@ -543,8 +511,4 @@ public class DebugPresenter {
         return showIdObservable;
     }
 
-    @Nonnull
-    public Observable<Integer> getHttpCodeObservable() {
-        return httpCodeObservable;
-    }
 }

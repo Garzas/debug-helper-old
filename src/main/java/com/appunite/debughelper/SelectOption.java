@@ -1,20 +1,32 @@
 package com.appunite.debughelper;
 
+import java.util.List;
+
 public class SelectOption {
 
-    private final int value;
     private final int option;
+    private int currentPosition;
+    private final List<Integer> values;
 
-    public SelectOption(int value, int option) {
-        this.value = value;
+    public SelectOption(int option, int currentPosition, List<Integer> values) {
         this.option = option;
-    }
-
-    public int getValue() {
-        return value;
+        this.currentPosition = currentPosition;
+        this.values = values;
     }
 
     public int getOption() {
         return option;
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public List<Integer> getValues() {
+        return values;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
     }
 }

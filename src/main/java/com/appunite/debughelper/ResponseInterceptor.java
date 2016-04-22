@@ -1,29 +1,48 @@
 package com.appunite.debughelper;
 
+import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
+
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
-public class ResponseInterceptor implements Interceptor
-{
+public class ResponseInterceptor implements Interceptor {
 
     private static int responseCode = 200;
-    private static boolean nullBody = false;
+    private static boolean emptyResponse = false;
 
     @Override
-    public Response intercept(Chain chain) throws IOException
-    {
+    public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Response response = chain.proceed(request);
+        MediaType contentType = response.body().contentType();
+        Response newResponse;
 
-//        MediaType contentType = response.body().contentType();
-//        ResponseBody responseBody = ResponseBody.create(contentType, "Response");
-        Response newResponse = response.newBuilder().code(responseCode).body(response.body()).build();
+        Gson gson = new Gson();
+        List<Object> arrayList = ImmutableList.of(new Object());
+        String emptyJson;
 
+        if (response.body().string().toString().charAt(0) == '{') {
+            emptyJson = gson.toJson(new Object());
+        } else {
+            emptyJson = gson.toJson(arrayList);
+        }
+
+        ResponseBody responseBody = ResponseBody.create(contentType, emptyJson);
+
+        if (emptyResponse) {
+            newResponse = response.newBuilder().code(responseCode).body(responseBody).build();
+        } else {
+            newResponse = response.newBuilder().code(responseCode).build();
+        }
         return handleError(newResponse);
     }
 
@@ -41,14 +60,12 @@ public class ResponseInterceptor implements Interceptor
     }
 
 
-
-
     public static void setResponseCode(int responseCode) {
         ResponseInterceptor.responseCode = responseCode;
     }
 
-    public static void setNullBody(boolean nullBody) {
-        ResponseInterceptor.nullBody = nullBody;
+    public static void setEmptyResponse(boolean emptyResponse) {
+        ResponseInterceptor.emptyResponse = emptyResponse;
     }
 
     public static int getResponseCode() {

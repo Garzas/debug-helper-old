@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.utils.OptionsDialog;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 
 
-public abstract class RxDebugActivity extends RxAppCompatActivity {
+public abstract class RxDebugActivity extends RxAppCompatActivity implements OptionsDialog.OnSelectOptionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,4 +45,8 @@ public abstract class RxDebugActivity extends RxAppCompatActivity {
         DebugHelper.onResume();
     }
 
+    @Override
+    public void onSelectOption(SelectOption option) {
+
+    }
 }

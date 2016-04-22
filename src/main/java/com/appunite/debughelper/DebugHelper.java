@@ -9,6 +9,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
 import com.github.pedrovgs.lynx.LynxConfig;
@@ -138,13 +139,11 @@ public class DebugHelper {
                                 //TODO disable leakcannary for all activities
                             }
                         }),
-
-                debugPresenter.getHttpCodeObservable()
-                        .subscribe(new Action1<Integer>() {
+                debugPresenter.showOptionsDialog()
+                        .subscribe(new Action1<SelectOption>() {
                             @Override
-                            public void call(Integer code) {
-                                ResponseInterceptor.setResponseCode(code);
-                                mActivity.recreate();
+                            public void call(SelectOption selectOption) {
+                                OptionsDialog.newInstance(selectOption).show(mActivity.getFragmentManager(), null);
                             }
                         })
 

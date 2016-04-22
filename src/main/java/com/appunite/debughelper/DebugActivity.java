@@ -5,8 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.utils.OptionsDialog;
 
-public abstract class DebugActivity extends AppCompatActivity {
+
+public abstract class DebugActivity extends AppCompatActivity implements OptionsDialog.OnSelectOptionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,4 +44,8 @@ public abstract class DebugActivity extends AppCompatActivity {
         DebugHelper.onResume();
     }
 
+    @Override
+    public void onSelectOption(SelectOption option) {
+
+    }
 }

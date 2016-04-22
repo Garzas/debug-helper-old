@@ -4,15 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxAdapter;
-import com.jakewharton.rxbinding.widget.RxAdapterView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
 
 import java.util.List;
@@ -24,7 +21,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 abstract class BaseDebugHolder extends RecyclerView.ViewHolder {
@@ -44,7 +40,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     private static final int TYPE_CATEGORY = 0;
     private static final int TYPE_INFORMATION = 1;
     private static final int TYPE_SWITCH = 2;
-    private static final int TYPE_SPINNER = 3;
+    private static final int TYPE_OPTION = 3;
     private static final int TYPE_ACTION = 4;
 
     static class CategoryHolder extends BaseDebugHolder {
@@ -106,55 +102,32 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
     }
 
-    static class SpinnerHolder extends BaseDebugHolder {
+    static class OptionHolder extends BaseDebugHolder {
 
         private final View view;
         private Subscription mSubscription;
 
-        TextView spinnerName;
-        Spinner spinner;
+        TextView optionName;
+        Button button;
 
 
-        public SpinnerHolder(View itemView) {
+        public OptionHolder(View itemView) {
             super(itemView);
             this.view = itemView;
 
-            spinnerName = (TextView) itemView.findViewById(R.id.debug_spinner_name);
-            spinner = (Spinner) itemView.findViewById(R.id.debug_spinner);
+            optionName = (TextView) itemView.findViewById(R.id.debug_option_name);
+            button = (Button) itemView.findViewById(R.id.debug_option_value);
         }
 
         @Override
         public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
             recycle();
-            final DebugPresenter.SpinnerItem spinnerItem = (DebugPresenter.SpinnerItem) item;
-            final ArrayAdapter<Integer> adapter = new ArrayAdapter<>(itemView.getContext(), android.R.layout.simple_list_item_1, spinnerItem.getValues());
+            final DebugPresenter.OptionItem optionItem = (DebugPresenter.OptionItem) item;
 
-            spinnerName.setText(spinnerItem.getName());
-            spinner.setAdapter(adapter);
+            button.setText(String.format("%d", optionItem.getCurrentValue()));
+            optionName.setText(optionItem.getName());
             mSubscription = new CompositeSubscription(
-                    Observable.just(ResponseInterceptor.getResponseCode())
-                            .filter(new Func1<Integer, Boolean>() {
-                                @Override
-                                public Boolean call(Integer integer) {
-                                    return spinnerItem.getOption() == DebugOption.SET_HTTP_CODE;
-                                }
-                            })
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(new Action1<Integer>() {
-                                @Override
-                                public void call(Integer integer) {
-                                    spinner.setSelection(DebugTools.selectHttpCodePosition(integer));
-                                }
-                            }),
-                    RxAdapterView.itemSelections(spinner)
-                            .map(new Func1<Integer, Integer>() {
-                                @Override
-                                public Integer call(Integer pos) {
-                                    return adapter.getItem(pos);
-                                }
-                            })
-                            .skip(2)
-                            .subscribe(spinnerItem.clickObserver()));
+                    RxView.clicks(button).subscribe(optionItem.clickObserver()));
 
         }
 
@@ -165,9 +138,9 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             }
         }
 
-        public static SpinnerHolder create(ViewGroup parent) {
+        public static OptionHolder create(ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return new SpinnerHolder(inflater.inflate(R.layout.debug_spinner_item, parent, false));
+            return new OptionHolder(inflater.inflate(R.layout.debug_option_item, parent, false));
         }
 
     }
@@ -269,14 +242,6 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
     }
 
-//
-//    @Nonnull
-//    private final Resources mResources;
-//    private final InputMethodManager mKeyboard;
-//    private final Picasso mPicasso;
-//    private final Context mContext;
-
-
     @Nonnull
     private List<DebugPresenter.BaseDebugItem> baseDebugItems = ImmutableList.of();
 
@@ -303,8 +268,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             return SwitchHolder.create(parent, debugPreferences);
         } else if (viewType == TYPE_ACTION) {
             return ActionHolder.create(parent);
-        } else if (viewType == TYPE_SPINNER) {
-            return SpinnerHolder.create(parent);
+        } else if (viewType == TYPE_OPTION) {
+            return OptionHolder.create(parent);
         }
         throw new RuntimeException("there is no type that matches the type "
                 + viewType
@@ -327,8 +292,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             return TYPE_INFORMATION;
         } else if (item instanceof DebugPresenter.SwitchItem) {
             return TYPE_SWITCH;
-        } else if (item instanceof DebugPresenter.SpinnerItem) {
-            return TYPE_SPINNER;
+        } else if (item instanceof DebugPresenter.OptionItem) {
+            return TYPE_OPTION;
         } else if (item instanceof DebugPresenter.ActionItem) {
             return TYPE_ACTION;
         } else {
