@@ -1,5 +1,7 @@
 package com.appunite.debughelper;
 
+import android.util.Log;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 
@@ -9,41 +11,67 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import okio.Buffer;
 
 public class ResponseInterceptor implements Interceptor {
 
     private static int responseCode = 200;
-    private static boolean emptyResponse = false;
+    private static boolean emptyResponse = true;
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
-        Response response = chain.proceed(request);
-        MediaType contentType = response.body().contentType();
         Response newResponse;
-
         Gson gson = new Gson();
         List<Object> arrayList = ImmutableList.of(new Object());
         String emptyJson;
+        Request request = chain.request();
+        Response response = chain.proceed(request);
 
-        if (response.body().string().toString().charAt(0) == '{') {
+        long t1 = System.nanoTime();
+        Log.d("DebugHelper", String.format("Sending request %s on %s%n%s",
+                request.url(), chain.connection(), request.headers()));
+
+        String bodyString = response.body().string();
+
+        long t2 = System.nanoTime();
+        Log.d("DebugHelper", String.format("Received response for %s in %.1fms%n%s",
+                response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+
+        Log.d("DebugHelper", String.format("Response: %s", bodyString.toString()));
+
+        if (bodyString.charAt(0) == '{') {
             emptyJson = gson.toJson(new Object());
         } else {
             emptyJson = gson.toJson(arrayList);
         }
 
-        ResponseBody responseBody = ResponseBody.create(contentType, emptyJson);
-
         if (emptyResponse) {
-            newResponse = response.newBuilder().code(responseCode).body(responseBody).build();
+            newResponse = response.newBuilder()
+                    .body(ResponseBody.create(response.body().contentType(), emptyJson))
+                    .code(responseCode).build();
         } else {
-            newResponse = response.newBuilder().code(responseCode).build();
+            newResponse = response.newBuilder()
+                    .body(ResponseBody.create(response.body().contentType(), bodyString))
+                    .code(responseCode)
+                    .build();
         }
         return handleError(newResponse);
+    }
+
+
+    public static String bodyToString(final Request request) {
+        try {
+            final Request copy = request.newBuilder().build();
+            final Buffer buffer = new Buffer();
+            copy.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (final IOException e) {
+            return "did not work";
+        }
     }
 
     @Nonnull
