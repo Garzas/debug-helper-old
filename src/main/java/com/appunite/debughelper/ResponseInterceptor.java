@@ -14,13 +14,11 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
-import okio.Buffer;
 
 public class ResponseInterceptor implements Interceptor {
 
     private static int responseCode = 200;
-    private static boolean emptyResponse = true;
+    private static boolean emptyResponse = false;
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -62,18 +60,6 @@ public class ResponseInterceptor implements Interceptor {
         return handleError(newResponse);
     }
 
-
-    public static String bodyToString(final Request request) {
-        try {
-            final Request copy = request.newBuilder().build();
-            final Buffer buffer = new Buffer();
-            copy.body().writeTo(buffer);
-            return buffer.readUtf8();
-        } catch (final IOException e) {
-            return "did not work";
-        }
-    }
-
     @Nonnull
     public Response handleError(Response response) throws IOException {
         if (response.isSuccessful()) {
@@ -99,4 +85,9 @@ public class ResponseInterceptor implements Interceptor {
     public static int getResponseCode() {
         return responseCode;
     }
+
+    public static boolean getEmptyResponse() {
+        return emptyResponse;
+    }
+
 }

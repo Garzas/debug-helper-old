@@ -45,7 +45,7 @@ public class DebugPresenter {
     @Nonnull
     private final Observable<String> showLogObservable;
     @Nonnull
-    private final Observable<Boolean> leakCanaryObservable;
+    private final Observable<Boolean> changeResponseObservable;
     @Nonnull
     private final BehaviorSubject<List<BaseDebugItem>> simpleListSubject = BehaviorSubject.create();
     @Nonnull
@@ -58,8 +58,7 @@ public class DebugPresenter {
     private final PublishSubject<String> resolutionSubject = PublishSubject.create();
     @Nonnull
     private final Context context;
-    @Nonnull
-    private final PublishSubject<SelectOption> changeOptionSubject = PublishSubject.create();
+    private DebugHelperPreferences debugPreferences;
 
     public abstract static class BaseDebugItem {
     }
@@ -204,10 +203,12 @@ public class DebugPresenter {
         @Nonnull
         private final String title;
         private int option;
+        private boolean switcher;
 
-        public SwitchItem(@Nonnull String title, int option) {
+        public SwitchItem(@Nonnull String title, int option, boolean switcher) {
             this.title = title;
             this.option = option;
+            this.switcher = switcher;
         }
 
         @Nonnull
@@ -217,6 +218,10 @@ public class DebugPresenter {
 
         public int getOption() {
             return option;
+        }
+
+        public boolean isSwitcher() {
+            return switcher;
         }
 
         @Override
@@ -295,8 +300,9 @@ public class DebugPresenter {
         }
     }
 
-    public DebugPresenter(@Nonnull final Context context) {
+    public DebugPresenter(@Nonnull final Context context, final DebugHelperPreferences debugPreferences) {
         this.context = context;
+        this.debugPreferences = debugPreferences;
 
         deviceInfoList = Observable.combineLatest(
                 resolutionSubject,
@@ -335,9 +341,9 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("Turn Scalpel ", DebugOption.SET_SCALPEL),
-                                new SwitchItem("Draw Views", DebugOption.SCALPEL_DRAW_VIEWS),
-                                new SwitchItem("Show Ids", DebugOption.SCALPEL_SHOW_ID));
+                                new SwitchItem("Turn Scalpel ", DebugOption.SET_SCALPEL, true),
+                                new SwitchItem("Draw Views", DebugOption.SCALPEL_DRAW_VIEWS, true),
+                                new SwitchItem("Show Ids", DebugOption.SCALPEL_SHOW_ID, true));
                     }
                 });
 
@@ -346,8 +352,8 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL),
-                                new SwitchItem("LeakCanary", DebugOption.LEAK_CANARY),
+                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL, true),
+                                new InformationItem("LeakCanary", "disabled"),
                                 new ActionItem("Show Log", DebugOption.SHOW_LOG));
                     }
                 });
@@ -372,6 +378,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
+                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, ResponseInterceptor.getEmptyResponse()))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
                                         ImmutableList.of(200,
                                                 201, 202, 203, 204, 205,
@@ -429,11 +436,11 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
-        leakCanaryObservable = switchOptionSubject
+        changeResponseObservable = switchOptionSubject
                 .filter(new Func1<SwitchOption, Boolean>() {
                     @Override
                     public Boolean call(SwitchOption switchOption) {
-                        return switchOption.getOption() == DebugOption.LEAK_CANARY;
+                        return switchOption.getOption() == DebugOption.SET_EMPTY_RESPONSE;
                     }
                 })
                 .map(checkSet());
@@ -451,18 +458,6 @@ public class DebugPresenter {
                         return "d";
                     }
                 });
-
-        changeOptionSubject.filter(new Func1<SelectOption, Boolean>() {
-            @Override
-            public Boolean call(SelectOption option) {
-                return option.getOption() == DebugOption.SET_HTTP_CODE;
-            }
-        }).subscribe(new Action1<SelectOption>() {
-            @Override
-            public void call(SelectOption option) {
-                ResponseInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
-            }
-        });
 
     }
 
@@ -503,11 +498,6 @@ public class DebugPresenter {
     }
 
     @Nonnull
-    public Observable<Boolean> getLeakCanaryObservable() {
-        return leakCanaryObservable;
-    }
-
-    @Nonnull
     public Observable<Boolean> setScalpelObservable() {
         return scalpelObservable;
     }
@@ -528,8 +518,7 @@ public class DebugPresenter {
     }
 
     @Nonnull
-    public Observer<SelectOption> optionObserver() {
-        return changeOptionSubject;
+    public Observable<Boolean> getChangeResponseObservable() {
+        return changeResponseObservable;
     }
-
 }

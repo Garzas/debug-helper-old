@@ -10,5 +10,6 @@ public class DebugOption {
     public static final int LEAK_CANARY = 5;
     public static final int SET_DELAY = 6;
     public static final int SET_HTTP_CODE = 7;
+    public static final int SET_EMPTY_RESPONSE = 8;
 
 }

@@ -35,6 +35,6 @@ public class DebugHelperPreferences {
     }
 
     public boolean getDebugState() {
-        return sharedPreferences.getBoolean(DEBUG_MODE, false);
+        return sharedPreferences.getBoolean(DEBUG_MODE, true);
     }
 }

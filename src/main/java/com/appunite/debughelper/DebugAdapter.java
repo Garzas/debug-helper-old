@@ -170,11 +170,11 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             title.setText(switchItem.getTitle());
 
             mSubscription = new CompositeSubscription(
-                    Observable.just(debugPreferences.getLeakCanaryState())
+                    Observable.just(switchItem.isSwitcher())
                             .filter(new Func1<Boolean, Boolean>() {
                                 @Override
-                                public Boolean call(Boolean o) {
-                                    return switchItem.getOption() == DebugOption.LEAK_CANARY;
+                                public Boolean call(Boolean aBoolean) {
+                                    return switchItem.getOption()== DebugOption.SET_EMPTY_RESPONSE;
                                 }
                             })
                             .subscribe(RxCompoundButton.checked(debugSwitch)),

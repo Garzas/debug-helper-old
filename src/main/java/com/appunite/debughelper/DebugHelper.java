@@ -39,8 +39,8 @@ public class DebugHelper {
     public static void setActivity(Activity activity) {
         mActivity = activity;
         debugPreferences = new DebugHelperPreferences(mActivity.getApplicationContext());
-        debugPresenter = new DebugPresenter(mActivity);
-        if (debugPreferences.getLeakCanaryState()) {
+        debugPresenter = new DebugPresenter(mActivity, debugPreferences);
+        if (debugPreferences.getDebugState()) {
             LeakCanary.install(mActivity.getApplication());
         }
     }
@@ -130,15 +130,15 @@ public class DebugHelper {
                             }
                         }),
 
-                debugPresenter.getLeakCanaryObservable()
+                debugPresenter.getChangeResponseObservable()
                         .subscribe(new Action1<Boolean>() {
                             @Override
-                            public void call(Boolean isSet) {
-                                debugPreferences.saveLeakCanaryState(isSet);
+                            public void call(Boolean aBoolean) {
+                                ResponseInterceptor.setEmptyResponse(aBoolean);
                                 mActivity.recreate();
-                                //TODO disable leakcannary for all activities
                             }
                         }),
+
                 debugPresenter.showOptionsDialog()
                         .subscribe(new Action1<SelectOption>() {
                             @Override
@@ -167,7 +167,10 @@ public class DebugHelper {
     }
 
     public static void updateOption(SelectOption option) {
-        debugPresenter.optionObserver().onNext(option);
+        switch (option.getOption()) {
+            case DebugOption.SET_HTTP_CODE:
+                ResponseInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
+        }
         mActivity.recreate();
     }
 }
