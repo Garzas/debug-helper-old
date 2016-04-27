@@ -14,7 +14,6 @@ import com.jakewharton.rxbinding.widget.RxCompoundButton;
 
 import java.util.List;
 
-
 import javax.annotation.Nonnull;
 
 import rx.Observable;
@@ -153,6 +152,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         Switch debugSwitch;
         TextView title;
+        View mockDisabled;
 
         public SwitchHolder(View itemView, DebugHelperPreferences debugPreferences) {
             super(itemView);
@@ -170,11 +170,11 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             title.setText(switchItem.getTitle());
 
             mSubscription = new CompositeSubscription(
-                    Observable.just(switchItem.isSwitcher())
+                    Observable.just(switchItem.isStaticSwitcher())
                             .filter(new Func1<Boolean, Boolean>() {
                                 @Override
                                 public Boolean call(Boolean aBoolean) {
-                                    return switchItem.getOption()== DebugOption.SET_EMPTY_RESPONSE;
+                                    return switchItem.getOption() == DebugOption.SET_EMPTY_RESPONSE;
                                 }
                             })
                             .subscribe(RxCompoundButton.checked(debugSwitch)),
@@ -182,8 +182,6 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
                             .skip(1)
                             .subscribe(switchItem.switchOption())
             );
-
-
         }
 
         @Override
