@@ -58,7 +58,6 @@ public class DebugPresenter {
     private final PublishSubject<String> resolutionSubject = PublishSubject.create();
     @Nonnull
     private final Context context;
-    private DebugHelperPreferences debugPreferences;
 
     public abstract static class BaseDebugItem {
     }
@@ -326,9 +325,8 @@ public class DebugPresenter {
         }
     }
 
-    public DebugPresenter(@Nonnull final Context context, final DebugHelperPreferences debugPreferences) {
+    public DebugPresenter(@Nonnull final Context context) {
         this.context = context;
-        this.debugPreferences = debugPreferences;
 
         deviceInfoList = Observable.combineLatest(
                 resolutionSubject,

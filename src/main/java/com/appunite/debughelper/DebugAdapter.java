@@ -22,6 +22,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
+import static com.appunite.debughelper.DebugHelper.getDebugPreferences;
+
 abstract class BaseDebugHolder extends RecyclerView.ViewHolder {
 
     public BaseDebugHolder(View itemView) {
@@ -108,7 +110,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         TextView optionName;
         Button button;
-
+        View mockDisabled;
 
         public OptionHolder(View itemView) {
             super(itemView);
@@ -116,12 +118,17 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
             optionName = (TextView) itemView.findViewById(R.id.debug_option_name);
             button = (Button) itemView.findViewById(R.id.debug_option_value);
+            mockDisabled = itemView.findViewById(R.id.mock_disabled_layout);
         }
 
         @Override
         public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
             recycle();
             final DebugPresenter.OptionItem optionItem = (DebugPresenter.OptionItem) item;
+
+            if (optionItem.isMockDepends()) {
+                mockDisabled.setVisibility(getDebugPreferences().getMockState() ? View.GONE : View.VISIBLE);
+            }
 
             button.setText(String.format("%d", ResponseInterceptor.getResponseCode()));
             optionName.setText(optionItem.getName());
@@ -160,6 +167,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             this.debugPreferences = debugPreferences;
             debugSwitch = (Switch) itemView.findViewById(R.id.debug_switch);
             title = (TextView) itemView.findViewById(R.id.debug_switch_title);
+            mockDisabled = itemView.findViewById(R.id.mock_disabled_layout);
         }
 
         @Override
@@ -168,6 +176,9 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             final DebugPresenter.SwitchItem switchItem = (DebugPresenter.SwitchItem) item;
 
             title.setText(switchItem.getTitle());
+            if (switchItem.isMockDepends()) {
+                mockDisabled.setVisibility(getDebugPreferences().getMockState() ? View.GONE : View.VISIBLE);
+            }
 
             mSubscription = new CompositeSubscription(
                     Observable.just(switchItem.isStaticSwitcher())

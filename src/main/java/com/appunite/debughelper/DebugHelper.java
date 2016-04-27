@@ -39,7 +39,7 @@ public class DebugHelper {
     public static void setActivity(Activity activity) {
         mActivity = activity;
         debugPreferences = new DebugHelperPreferences(mActivity.getApplicationContext());
-        debugPresenter = new DebugPresenter(mActivity, debugPreferences);
+        debugPresenter = new DebugPresenter(mActivity);
         if (debugPreferences.getDebugState()) {
             LeakCanary.install(mActivity.getApplication());
         }
@@ -164,6 +164,10 @@ public class DebugHelper {
     @Nonnull
     public static Interceptor getDelayInterceptor() {
         return new ResponseInterceptor();
+    }
+
+    public static DebugHelperPreferences getDebugPreferences() {
+        return debugPreferences;
     }
 
     public static void updateOption(SelectOption option) {
