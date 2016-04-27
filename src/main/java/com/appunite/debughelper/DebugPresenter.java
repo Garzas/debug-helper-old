@@ -144,6 +144,15 @@ public class DebugPresenter {
         @Nonnull
         private final List<Integer> values;
         private int currentPosition;
+        private boolean mockDepends;
+
+        public OptionItem(@Nonnull String name, int option, @Nonnull List<Integer> values, int currentPosition, boolean mockDepends) {
+            this.name = name;
+            this.option = option;
+            this.values = values;
+            this.currentPosition = currentPosition;
+            this.mockDepends = mockDepends;
+        }
 
         public OptionItem(@Nonnull String name, int option, @Nonnull List<Integer> values, int currentPosition) {
             this.name = name;
@@ -168,6 +177,10 @@ public class DebugPresenter {
 
         public int getCurrentPosition() {
             return currentPosition;
+        }
+
+        public boolean isMockDepends() {
+            return mockDepends;
         }
 
         @Override
@@ -203,13 +216,22 @@ public class DebugPresenter {
         @Nonnull
         private final String title;
         private int option;
-        private boolean switcher;
+        private Boolean staticSwitcher;
+        private Boolean mockDepends;
 
-        public SwitchItem(@Nonnull String title, int option, boolean switcher) {
+        public SwitchItem(@Nonnull String title, int option, Boolean staticSwitcher, Boolean mockDepends) {
             this.title = title;
             this.option = option;
-            this.switcher = switcher;
+            this.staticSwitcher = staticSwitcher;
+            this.mockDepends = mockDepends;
         }
+
+        public SwitchItem(@Nonnull String title, int option, Boolean mockDepends) {
+            this.title = title;
+            this.option = option;
+            this.mockDepends = mockDepends;
+        }
+
 
         @Nonnull
         public String getTitle() {
@@ -220,8 +242,12 @@ public class DebugPresenter {
             return option;
         }
 
-        public boolean isSwitcher() {
-            return switcher;
+        public Boolean isStaticSwitcher() {
+            return staticSwitcher;
+        }
+
+        public Boolean isMockDepends() {
+            return mockDepends;
         }
 
         @Override
@@ -341,9 +367,9 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("Turn Scalpel ", DebugOption.SET_SCALPEL, true),
-                                new SwitchItem("Draw Views", DebugOption.SCALPEL_DRAW_VIEWS, true),
-                                new SwitchItem("Show Ids", DebugOption.SCALPEL_SHOW_ID, true));
+                                new SwitchItem("Turn Scalpel ", DebugOption.SET_SCALPEL, false),
+                                new SwitchItem("Draw Views", DebugOption.SCALPEL_DRAW_VIEWS, false),
+                                new SwitchItem("Show Ids", DebugOption.SCALPEL_SHOW_ID, false));
                     }
                 });
 
@@ -352,7 +378,7 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL, true),
+                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL, false),
                                 new InformationItem("LeakCanary", "disabled"),
                                 new ActionItem("Show Log", DebugOption.SHOW_LOG));
                     }
@@ -378,7 +404,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
-                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, ResponseInterceptor.getEmptyResponse()))
+                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, ResponseInterceptor.getEmptyResponse(), true))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
                                         ImmutableList.of(200,
                                                 201, 202, 203, 204, 205,
@@ -388,7 +414,7 @@ public class DebugPresenter {
                                                 408, 409, 410, 411, 412,
                                                 413, 414, 415, 500, 501,
                                                 502, 503, 504, 505),
-                                        DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode())))
+                                        DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode()), true))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
