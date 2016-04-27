@@ -145,7 +145,14 @@ public class DebugHelper {
                             public void call(SelectOption selectOption) {
                                 OptionsDialog.newInstance(selectOption).show(mActivity.getFragmentManager(), null);
                             }
-                        })
+                        }),
+                debugPresenter.recreateActivityObservable()
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        mActivity.recreate();
+                    }
+                })
 
         ));
 

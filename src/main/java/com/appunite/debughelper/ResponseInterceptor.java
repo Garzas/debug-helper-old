@@ -15,6 +15,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import static com.appunite.debughelper.DebugHelper.getDebugPreferences;
+
 public class ResponseInterceptor implements Interceptor {
 
     private static int responseCode = 200;
@@ -28,6 +30,9 @@ public class ResponseInterceptor implements Interceptor {
         String emptyJson;
         Request request = chain.request();
         Response response = chain.proceed(request);
+        if (!getDebugPreferences().getMockState()) {
+            return response;
+        }
 
         long t1 = System.nanoTime();
         Log.d("DebugHelper", String.format("Sending request %s on %s%n%s",

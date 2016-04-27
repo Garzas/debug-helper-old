@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.view.RxView;
@@ -30,7 +31,7 @@ abstract class BaseDebugHolder extends RecyclerView.ViewHolder {
         super(itemView);
     }
 
-    public abstract void bind(@Nonnull DebugPresenter.BaseDebugItem card);
+    public abstract void bind(@Nonnull DebugPresenter.BaseDebugItem item);
 
     public abstract void recycle();
 }
@@ -43,6 +44,52 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     private static final int TYPE_SWITCH = 2;
     private static final int TYPE_OPTION = 3;
     private static final int TYPE_ACTION = 4;
+    private static final int TYPE_MAIN = 5;
+
+    static class MainOptionHolder extends BaseDebugHolder {
+
+        private Subscription mSubscription;
+
+        ToggleButton mockButton;
+
+        public MainOptionHolder(View itemView) {
+            super(itemView);
+
+            mockButton = (ToggleButton) itemView.findViewById(R.id.mock_toggle);
+        }
+
+        @Override
+        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+            final DebugPresenter.MainItem mainItem = (DebugPresenter.MainItem) item;
+
+            mockButton.setChecked(getDebugPreferences().getMockState());
+
+            mSubscription = new CompositeSubscription(
+                    RxCompoundButton.checkedChanges(mockButton)
+                            .skip(1)
+                            .subscribe(new Action1<Boolean>() {
+                                @Override
+                                public void call(Boolean aBoolean) {
+                                    getDebugPreferences().saveMockState(aBoolean);
+                                    mainItem.clickObserver().onNext(new Object());
+                                }
+                            })
+            );
+        }
+
+        @Override
+        public void recycle() {
+            if (mSubscription != null) {
+                mSubscription.unsubscribe();
+            }
+
+        }
+
+        public static MainOptionHolder create(ViewGroup parent) {
+            final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            return new MainOptionHolder(inflater.inflate(R.layout.debug_main_item, parent, false));
+        }
+    }
 
     static class CategoryHolder extends BaseDebugHolder {
 
@@ -279,6 +326,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             return ActionHolder.create(parent);
         } else if (viewType == TYPE_OPTION) {
             return OptionHolder.create(parent);
+        } else if (viewType == TYPE_MAIN) {
+            return MainOptionHolder.create(parent);
         }
         throw new RuntimeException("there is no type that matches the type "
                 + viewType
@@ -305,6 +354,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             return TYPE_OPTION;
         } else if (item instanceof DebugPresenter.ActionItem) {
             return TYPE_ACTION;
+        } else if (item instanceof DebugPresenter.MainItem) {
+            return TYPE_MAIN;
         } else {
             throw new IllegalStateException("Cannot find item for position" + position);
         }

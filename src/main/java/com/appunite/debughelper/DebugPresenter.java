@@ -58,8 +58,37 @@ public class DebugPresenter {
     private final PublishSubject<String> resolutionSubject = PublishSubject.create();
     @Nonnull
     private final Context context;
+    @Nonnull
+    private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
 
     public abstract static class BaseDebugItem {
+    }
+
+    public class MainItem extends BaseDebugItem {
+        private boolean mock;
+        private boolean debug;
+
+        public MainItem(boolean mock, boolean debug) {
+            this.mock = mock;
+            this.debug = debug;
+        }
+
+        public boolean isMock() {
+            return mock;
+        }
+
+        public boolean isDebug() {
+            return debug;
+        }
+
+        public Observer<Object> clickObserver() {
+            return Observers.create(new Action1<Object>() {
+                @Override
+                public void call(Object o) {
+                    recreateActivitySubject.onNext(o);
+                }
+            });
+        }
     }
 
     public class CategoryItem extends BaseDebugItem {
@@ -397,6 +426,7 @@ public class DebugPresenter {
                             List<BaseDebugItem> scalpelUtils,
                             List<BaseDebugItem> utils) {
                         return ImmutableList.<BaseDebugItem>builder()
+                                .add(new MainItem(true, true))
                                 .add(new CategoryItem("Device Information"))
                                 .addAll(deviceInfo)
                                 .add(new CategoryItem("About app"))
@@ -544,5 +574,10 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Boolean> getChangeResponseObservable() {
         return changeResponseObservable;
+    }
+
+    @Nonnull
+    public Observable<Object> recreateActivityObservable() {
+        return recreateActivitySubject;
     }
 }
