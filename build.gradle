@@ -74,6 +74,7 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
     compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
     compile 'com.google.guava:guava:18.0'
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
