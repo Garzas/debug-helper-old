@@ -169,7 +169,7 @@ public class DebugHelper {
     }
 
     @Nonnull
-    public static Interceptor getDelayInterceptor() {
+    public static Interceptor getResponseInterceptor() {
         return new ResponseInterceptor();
     }
 
