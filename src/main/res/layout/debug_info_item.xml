@@ -11,7 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        tools:text="Some name"/>
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLength="12"
+        tools:text="Some name long long long name"/>
 
     <View
         android:id="@+id/debug_center_view"
