@@ -134,7 +134,7 @@ public class DebugHelper {
                         .subscribe(new Action1<Boolean>() {
                             @Override
                             public void call(Boolean aBoolean) {
-                                SampleInterceptor.setEmptyResponse(aBoolean);
+                                DebugInterceptor.setEmptyResponse(aBoolean);
                                 mActivity.recreate();
                             }
                         }),
@@ -192,7 +192,7 @@ public class DebugHelper {
     public static void updateOption(SelectOption option) {
         switch (option.getOption()) {
             case DebugOption.SET_HTTP_CODE:
-                SampleInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
+                DebugInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
         }
         mActivity.recreate();
     }

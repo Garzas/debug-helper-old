@@ -35,7 +35,7 @@ public class InfoListFragment extends DialogFragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recylcerview);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        final MyAdapter adapter = new MyAdapter(SampleInterceptor.getRequestCounter());
+        final MyAdapter adapter = new MyAdapter(DebugInterceptor.getRequestCounter());
         recyclerView.setAdapter(adapter);
 
         clearButton = (Button) rootView.findViewById(R.id.clear_counter_button);
@@ -43,8 +43,8 @@ public class InfoListFragment extends DialogFragment {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SampleInterceptor.cleanRequestLogs();
-                adapter.updateData(SampleInterceptor.getRequestCounter());
+                DebugInterceptor.cleanRequestLogs();
+                adapter.updateData(DebugInterceptor.getRequestCounter());
             }
         });
 
