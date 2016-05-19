@@ -4,17 +4,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
-import com.google.common.collect.ImmutableList;
-
-import org.apache.http.params.HttpConnectionParams;
-
 import javax.net.ssl.HttpsURLConnection;
-
-import okhttp3.HttpUrl;
 
 public class DebugTools {
 
-    public static String checkSDKNamme(int sdkInt) {
+    public static String checkSDKName(int sdkInt) {
         switch (sdkInt) {
             case Build.VERSION_CODES.BASE: // API level 1
                 return "Base";
@@ -253,11 +247,7 @@ public class DebugTools {
 
     public static String getBuildVersion(Context context) {
         try {
-            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-            version = version.replace(".debug", "");
-            version = version.replace(".release", "");
-
-            return version;
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return "Unknown";
@@ -265,19 +255,12 @@ public class DebugTools {
     }
 
     public static String getBuildType(Context context) {
-        try {
-            String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-            if (version.contains("debug")) {
-                return "debug";
-            } else if (version.contains(".release")) {
-                return "release";
-            } else {
-                return "Unknown";
-            }
+        boolean isDebuggable = (0 != (context.getApplicationInfo().flags & context.getApplicationInfo().FLAG_DEBUGGABLE));
+        if (isDebuggable) {
+            return "debug";
+        } else {
+            return "Release";
 
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return "Unknown";
         }
     }
 

@@ -378,7 +378,7 @@ public class DebugPresenter {
                     public List<InformationItem> call(String resolution, Float density, ActivityManager.MemoryInfo mi) {
                         return ImmutableList.of(
                                 new InformationItem("Model", Build.MANUFACTURER + " " + Build.MODEL),
-                                new InformationItem("SDK", DebugTools.checkSDKNamme(
+                                new InformationItem("SDK", DebugTools.checkSDKName(
                                         Build.VERSION.SDK_INT)
                                         + "(" + Build.VERSION.SDK_INT
                                         + " API)"),
