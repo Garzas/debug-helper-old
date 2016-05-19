@@ -12,9 +12,9 @@
         android:padding="12dp"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:text="Request Counter"/>
+        android:text="Macro List"/>
 
     <View
         android:layout_marginTop="4dp"
@@ -23,35 +23,18 @@
         android:layout_marginBottom="8dp"
         android:background="@android:color/white"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:orientation="horizontal">
-
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="Request URL"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:layout_weight="3"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:lines="2"
-            android:text="Request count"
-            android:layout_weight="1"/>
-
-    </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="Fill the gaps and click create macro to save fields "
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/white"/>
 
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/info_recyclerview"
+        android:id="@+id/macro_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -60,11 +43,11 @@
         android:choiceMode="singleChoice"/>
 
     <Button
-        android:id="@+id/clear_counter_button"
+        android:id="@+id/create_macro_button"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-         android:background="@color/debug_background"
+        android:background="@color/debug_background"
         android:textColor="@color/white"
-        android:text="CLEAR COUNTER"/>
+        android:text="CREATE MACRO FROM CURRENT ACTIVITY"/>
 
 </LinearLayout>

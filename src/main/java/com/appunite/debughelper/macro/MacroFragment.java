@@ -1,4 +1,4 @@
-package com.appunite.debughelper;
+package com.appunite.debughelper.macro;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -10,14 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.appunite.debughelper.R;
 
-public class InfoListFragment extends DialogFragment {
+
+public class MacroFragment extends DialogFragment {
      RecyclerView recyclerView;
      RecyclerView.LayoutManager mLayoutManager;
-    Button clearButton;
+    Button createMacroButton;
 
     public static Fragment newInstance() {
-        return new InfoListFragment();
+        return new MacroFragment();
     }
 
     @Override
@@ -28,25 +30,19 @@ public class InfoListFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_layout, container, true);
+        View rootView = inflater.inflate(R.layout.macro_layout, container, true);
 
-
+        ViewGroup viewGroup = (ViewGroup) getActivity().findViewById(R.id.main_frame);
+        final int childCount = viewGroup.getChildCount();
         mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recyclerview);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.macro_recyclerview);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        final CountAdapter adapter = new CountAdapter(DebugInterceptor.getRequestCounter());
+        DebugAutoFill debugAutoFill = new DebugAutoFill(viewGroup.getChildAt(0), getActivity().hashCode());
+        final MacroAdapter adapter = new MacroAdapter(debugAutoFill.getMacroList());
         recyclerView.setAdapter(adapter);
 
-        clearButton = (Button) rootView.findViewById(R.id.clear_counter_button);
-
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DebugInterceptor.cleanRequestLogs();
-                adapter.updateData(DebugInterceptor.getRequestCounter());
-            }
-        });
+        createMacroButton = (Button) rootView.findViewById(R.id.create_macro_button);
 
         return rootView;
     }

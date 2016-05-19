@@ -9,6 +9,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.macro.DebugAutoFill;
+import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
@@ -60,6 +62,7 @@ public class DebugHelper {
         mainFrame.addView(child);
         final ScalpelFrameLayout scalpelFrame = (ScalpelFrameLayout) mainFrame;
         final DebugAdapter debugAdapter = new DebugAdapter(debugPreferences);
+        DebugAutoFill autoFill = new DebugAutoFill(child, mActivity.hashCode());
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
 
@@ -148,23 +151,34 @@ public class DebugHelper {
                         }),
 
                 debugPresenter.getShowRequestObservable()
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                       mActivity.getFragmentManager()
-                                .beginTransaction()
-                                .add(InfoListFragment.newInstance(), "TAG")
-                                .disallowAddToBackStack()
-                                .commit();
-                    }
-                }),
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer integer) {
+                                mActivity.getFragmentManager()
+                                        .beginTransaction()
+                                        .add(InfoListFragment.newInstance(), "TAG")
+                                        .disallowAddToBackStack()
+                                        .commit();
+                            }
+                        }),
+                debugPresenter.getShowMacroObservable()
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer integer) {
+                                mActivity.getFragmentManager()
+                                        .beginTransaction()
+                                        .add(MacroFragment.newInstance(), "MACRO")
+                                        .disallowAddToBackStack()
+                                        .commit();
+                            }
+                        }),
                 debugPresenter.recreateActivityObservable()
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        mActivity.recreate();
-                    }
-                })
+                        .subscribe(new Action1<Object>() {
+                            @Override
+                            public void call(Object o) {
+                                mActivity.recreate();
+                            }
+                        })
 
         ));
 
