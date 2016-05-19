@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Interceptor;
@@ -17,6 +18,7 @@ import static com.appunite.debughelper.DebugHelper.getDebugPreferences;
 
 public class ResponseInterceptor implements Interceptor {
 
+    private static HashMap<String, Integer> requestCounter = new HashMap<>();
     private static int responseCode = 200;
     private static boolean emptyResponse = false;
 
@@ -42,6 +44,14 @@ public class ResponseInterceptor implements Interceptor {
         return emptyResponse;
     }
 
+    public static void cleanRequestLogs() {
+        requestCounter.clear();
+    }
+
+    public static HashMap<String, Integer> getRequestCounter() {
+        return requestCounter;
+    }
+
 
     public static Response fakeResponse(Chain chain) throws IOException {
         Response.Builder newResponse;
@@ -54,6 +64,12 @@ public class ResponseInterceptor implements Interceptor {
             return response;
         }
 
+        final String key = request.url().toString();
+        if (requestCounter.containsKey(key)) {
+            requestCounter.put(key, requestCounter.get(key) + 1);
+        } else {
+            requestCounter.put(key, 1);
+        }
         long t1 = System.nanoTime();
         Log.d("DebugHelper", String.format("Sending request %s on %s%n%s",
                 request.url(), chain.connection(), request.headers()));

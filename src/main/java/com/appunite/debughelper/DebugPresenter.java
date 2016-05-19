@@ -62,6 +62,7 @@ public class DebugPresenter {
     @Nonnull
     private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
     private final Observable<ActivityManager.MemoryInfo> memorySubject;
+    private final Observable<Integer> showRequestObservable;
 
     public abstract static class BaseDebugItem {
     }
@@ -457,6 +458,7 @@ public class DebugPresenter {
                                                 413, 414, 415, 500, 501,
                                                 502, 503, 504, 505),
                                         DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode()), true))
+                                .add(new ActionItem("Request counter", DebugOption.SHOW_REQUEST))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
@@ -527,6 +529,14 @@ public class DebugPresenter {
                     }
                 });
 
+        showRequestObservable = actionSubject
+                .filter(new Func1<Integer, Boolean>() {
+                    @Override
+                    public Boolean call(Integer integer) {
+                        return integer.equals(DebugOption.SHOW_REQUEST);
+                    }
+                });
+
     }
 
     @Nonnull
@@ -593,5 +603,10 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Object> recreateActivityObservable() {
         return recreateActivitySubject;
+    }
+
+    @Nonnull
+    public Observable<Integer> getShowRequestObservable() {
+        return showRequestObservable;
     }
 }

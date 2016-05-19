@@ -146,6 +146,19 @@ public class DebugHelper {
                                 OptionsDialog.newInstance(selectOption).show(mActivity.getFragmentManager(), null);
                             }
                         }),
+
+                debugPresenter.getShowRequestObservable()
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                       mActivity.getFragmentManager()
+                                .beginTransaction()
+                                .add(InfoListFragment.newInstance(), "TAG")
+                                .disallowAddToBackStack()
+                                .commit();
+                        InfoListFragment.updateAdapter();
+                    }
+                }),
                 debugPresenter.recreateActivityObservable()
                 .subscribe(new Action1<Object>() {
                     @Override
