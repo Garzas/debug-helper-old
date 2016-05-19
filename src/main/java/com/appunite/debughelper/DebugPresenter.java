@@ -447,7 +447,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
-                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, ResponseInterceptor.getEmptyResponse(), true))
+                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, SampleInterceptor.getEmptyResponse(), true))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
                                         ImmutableList.of(200,
                                                 201, 202, 203, 204, 205,
@@ -457,7 +457,7 @@ public class DebugPresenter {
                                                 408, 409, 410, 411, 412,
                                                 413, 414, 415, 500, 501,
                                                 502, 503, 504, 505),
-                                        DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode()), true))
+                                        DebugTools.selectHttpCodePosition(SampleInterceptor.getResponseCode()), true))
                                 .add(new ActionItem("Request counter", DebugOption.SHOW_REQUEST))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)

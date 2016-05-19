@@ -2,7 +2,6 @@ package com.appunite.debughelper;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,7 +35,7 @@ public class InfoListFragment extends DialogFragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recylcerview);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        final MyAdapter adapter = new MyAdapter(ResponseInterceptor.getRequestCounter());
+        final MyAdapter adapter = new MyAdapter(SampleInterceptor.getRequestCounter());
         recyclerView.setAdapter(adapter);
 
         clearButton = (Button) rootView.findViewById(R.id.clear_counter_button);
@@ -44,8 +43,8 @@ public class InfoListFragment extends DialogFragment {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ResponseInterceptor.cleanRequestLogs();
-                adapter.updateData(ResponseInterceptor.getRequestCounter());
+                SampleInterceptor.cleanRequestLogs();
+                adapter.updateData(SampleInterceptor.getRequestCounter());
             }
         });
 

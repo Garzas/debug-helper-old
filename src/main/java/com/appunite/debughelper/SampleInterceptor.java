@@ -16,7 +16,7 @@ import okhttp3.ResponseBody;
 
 import static com.appunite.debughelper.DebugHelper.getDebugPreferences;
 
-public class ResponseInterceptor implements Interceptor {
+public class SampleInterceptor implements Interceptor {
 
     private static HashMap<String, Integer> requestCounter = new HashMap<>();
     private static int responseCode = 200;
@@ -29,11 +29,11 @@ public class ResponseInterceptor implements Interceptor {
     }
 
     public static void setResponseCode(int responseCode) {
-        ResponseInterceptor.responseCode = responseCode;
+        SampleInterceptor.responseCode = responseCode;
     }
 
     public static void setEmptyResponse(boolean emptyResponse) {
-        ResponseInterceptor.emptyResponse = emptyResponse;
+        SampleInterceptor.emptyResponse = emptyResponse;
     }
 
     public static int getResponseCode() {

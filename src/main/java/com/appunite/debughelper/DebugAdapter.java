@@ -177,7 +177,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
                 mockDisabled.setVisibility(getDebugPreferences().getMockState() ? View.GONE : View.VISIBLE);
             }
 
-            button.setText(String.format("%d", ResponseInterceptor.getResponseCode()));
+            button.setText(String.format("%d", SampleInterceptor.getResponseCode()));
             optionName.setText(optionItem.getName());
             mSubscription = new CompositeSubscription(
                     RxView.clicks(button).subscribe(optionItem.clickObserver()));
