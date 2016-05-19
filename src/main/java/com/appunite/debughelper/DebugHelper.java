@@ -134,7 +134,7 @@ public class DebugHelper {
                         .subscribe(new Action1<Boolean>() {
                             @Override
                             public void call(Boolean aBoolean) {
-                                ResponseInterceptor.setEmptyResponse(aBoolean);
+                                DebugInterceptor.setEmptyResponse(aBoolean);
                                 mActivity.recreate();
                             }
                         }),
@@ -146,6 +146,18 @@ public class DebugHelper {
                                 OptionsDialog.newInstance(selectOption).show(mActivity.getFragmentManager(), null);
                             }
                         }),
+
+                debugPresenter.getShowRequestObservable()
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                       mActivity.getFragmentManager()
+                                .beginTransaction()
+                                .add(InfoListFragment.newInstance(), "TAG")
+                                .disallowAddToBackStack()
+                                .commit();
+                    }
+                }),
                 debugPresenter.recreateActivityObservable()
                 .subscribe(new Action1<Object>() {
                     @Override
@@ -170,7 +182,7 @@ public class DebugHelper {
 
     @Nonnull
     public static Interceptor getResponseInterceptor() {
-        return new ResponseInterceptor();
+        return new SampleInterceptor();
     }
 
     public static DebugHelperPreferences getDebugPreferences() {
@@ -180,7 +192,7 @@ public class DebugHelper {
     public static void updateOption(SelectOption option) {
         switch (option.getOption()) {
             case DebugOption.SET_HTTP_CODE:
-                ResponseInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
+                DebugInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
         }
         mActivity.recreate();
     }

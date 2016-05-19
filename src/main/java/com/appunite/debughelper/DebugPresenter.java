@@ -62,6 +62,7 @@ public class DebugPresenter {
     @Nonnull
     private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
     private final Observable<ActivityManager.MemoryInfo> memorySubject;
+    private final Observable<Integer> showRequestObservable;
 
     public abstract static class BaseDebugItem {
     }
@@ -446,7 +447,7 @@ public class DebugPresenter {
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("OKHTTP options"))
-                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, ResponseInterceptor.getEmptyResponse(), true))
+                                .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, DebugInterceptor.getEmptyResponse(), true))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
                                         ImmutableList.of(200,
                                                 201, 202, 203, 204, 205,
@@ -456,7 +457,8 @@ public class DebugPresenter {
                                                 408, 409, 410, 411, 412,
                                                 413, 414, 415, 500, 501,
                                                 502, 503, 504, 505),
-                                        DebugTools.selectHttpCodePosition(ResponseInterceptor.getResponseCode()), true))
+                                        DebugTools.selectHttpCodePosition(DebugInterceptor.getResponseCode()), true))
+                                .add(new ActionItem("Request counter", DebugOption.SHOW_REQUEST))
                                 .add(new CategoryItem("Scalpel Utils"))
                                 .addAll(scalpelUtils)
                                 .add(new CategoryItem("Tools"))
@@ -527,6 +529,14 @@ public class DebugPresenter {
                     }
                 });
 
+        showRequestObservable = actionSubject
+                .filter(new Func1<Integer, Boolean>() {
+                    @Override
+                    public Boolean call(Integer integer) {
+                        return integer.equals(DebugOption.SHOW_REQUEST);
+                    }
+                });
+
     }
 
     @Nonnull
@@ -593,5 +603,10 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Object> recreateActivityObservable() {
         return recreateActivitySubject;
+    }
+
+    @Nonnull
+    public Observable<Integer> getShowRequestObservable() {
+        return showRequestObservable;
     }
 }
