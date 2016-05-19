@@ -1,6 +1,7 @@
 package com.appunite.debughelper;
 
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 
@@ -16,7 +17,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.functions.Func4;
 import rx.observers.Observers;
 import rx.subjects.BehaviorSubject;
@@ -60,6 +61,7 @@ public class DebugPresenter {
     private final Context context;
     @Nonnull
     private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
+    private final Observable<ActivityManager.MemoryInfo> memorySubject;
 
     public abstract static class BaseDebugItem {
     }
@@ -357,12 +359,23 @@ public class DebugPresenter {
     public DebugPresenter(@Nonnull final Context context) {
         this.context = context;
 
+        memorySubject = Observable.just((Long) null).map(new Func1<Long, ActivityManager.MemoryInfo>() {
+            @Override
+            public ActivityManager.MemoryInfo call(Long aLong) {
+                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                activityManager.getMemoryInfo(mi);
+                return mi;
+            }
+        });
+
         deviceInfoList = Observable.combineLatest(
                 resolutionSubject,
                 densitySubject,
-                new Func2<String, Float, List<InformationItem>>() {
+                memorySubject,
+                new Func3<String, Float, ActivityManager.MemoryInfo, List<InformationItem>>() {
                     @Override
-                    public List<InformationItem> call(String resolution, Float density) {
+                    public List<InformationItem> call(String resolution, Float density, ActivityManager.MemoryInfo mi) {
                         return ImmutableList.of(
                                 new InformationItem("Model", Build.MANUFACTURER + " " + Build.MODEL),
                                 new InformationItem("SDK", DebugTools.checkSDKNamme(
@@ -371,7 +384,8 @@ public class DebugPresenter {
                                         + " API)"),
                                 new InformationItem("Release", Build.VERSION.RELEASE),
                                 new InformationItem("Resolution", resolution),
-                                new InformationItem("Density", Math.round(density) + "dpi"));
+                                new InformationItem("Density", Math.round(density) + "dpi"),
+                                new InformationItem("Free Memory", (mi.availMem / 1048576L) + " MB"));
                     }
                 });
 
