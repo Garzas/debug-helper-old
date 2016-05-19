@@ -156,7 +156,6 @@ public class DebugHelper {
                                 .add(InfoListFragment.newInstance(), "TAG")
                                 .disallowAddToBackStack()
                                 .commit();
-                        InfoListFragment.updateAdapter();
                     }
                 }),
                 debugPresenter.recreateActivityObservable()

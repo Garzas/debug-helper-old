@@ -266,7 +266,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         public ActionHolder(View itemView) {
             super(itemView);
             this.view = itemView;
-            actionName = (TextView) itemView.findViewById(R.id.debug_info_name);
+            actionName = (TextView) itemView.findViewById(R.id.debug_action_name);
         }
 
         @Override
@@ -293,7 +293,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         public static ActionHolder create(ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return new ActionHolder(inflater.inflate(R.layout.debug_info_item, parent, false));
+            return new ActionHolder(inflater.inflate(R.layout.debug_action_item, parent, false));
         }
 
     }

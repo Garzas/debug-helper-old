@@ -2,21 +2,20 @@ package com.appunite.debughelper;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-
+import android.widget.Button;
 
 
 public class InfoListFragment extends DialogFragment {
-    protected ListView listView;
-    protected RecyclerView.LayoutManager mLayoutManager;
-
-    static MyAdapter adapter;
+     RecyclerView recyclerView;
+     RecyclerView.LayoutManager mLayoutManager;
+    Button clearButton;
 
     public static Fragment newInstance() {
         return new InfoListFragment();
@@ -34,15 +33,23 @@ public class InfoListFragment extends DialogFragment {
 
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-        listView = (ListView) rootView.findViewById(R.id.info_listview);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recylcerview);
+        recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new MyAdapter(ResponseInterceptor.getRequestCounter());
-        listView.setAdapter(adapter);
+        final MyAdapter adapter = new MyAdapter(ResponseInterceptor.getRequestCounter());
+        recyclerView.setAdapter(adapter);
+
+        clearButton = (Button) rootView.findViewById(R.id.clear_counter_button);
+
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ResponseInterceptor.cleanRequestLogs();
+                adapter.updateData(ResponseInterceptor.getRequestCounter());
+            }
+        });
 
         return rootView;
     }
 
-    public static void updateAdapter() {
-        adapter.notifyDataSetChanged();
-    }
 }
