@@ -9,6 +9,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.macro.MacroItem;
+import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
@@ -148,23 +150,34 @@ public class DebugHelper {
                         }),
 
                 debugPresenter.getShowRequestObservable()
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                       mActivity.getFragmentManager()
-                                .beginTransaction()
-                                .add(InfoListFragment.newInstance(), "TAG")
-                                .disallowAddToBackStack()
-                                .commit();
-                    }
-                }),
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer integer) {
+                                mActivity.getFragmentManager()
+                                        .beginTransaction()
+                                        .add(InfoListFragment.newInstance(), "REQUEST_COUNTER")
+                                        .disallowAddToBackStack()
+                                        .commit();
+                            }
+                        }),
+                debugPresenter.getShowMacroObservable()
+                        .subscribe(new Action1<Integer>() {
+                            @Override
+                            public void call(Integer integer) {
+                                mActivity.getFragmentManager()
+                                        .beginTransaction()
+                                        .add(MacroFragment.newInstance(), "MACRO_FRAGMENT")
+                                        .disallowAddToBackStack()
+                                        .commit();
+                            }
+                        }),
                 debugPresenter.recreateActivityObservable()
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        mActivity.recreate();
-                    }
-                })
+                        .subscribe(new Action1<Object>() {
+                            @Override
+                            public void call(Object o) {
+                                mActivity.recreate();
+                            }
+                        })
 
         ));
 

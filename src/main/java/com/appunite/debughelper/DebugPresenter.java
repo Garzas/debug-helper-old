@@ -63,6 +63,7 @@ public class DebugPresenter {
     private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
     private final Observable<ActivityManager.MemoryInfo> memorySubject;
     private final Observable<Integer> showRequestObservable;
+    private final Observable<Integer> showMacroObservable;
 
     public abstract static class BaseDebugItem {
     }
@@ -446,6 +447,8 @@ public class DebugPresenter {
                                 .addAll(deviceInfo)
                                 .add(new CategoryItem("About app"))
                                 .addAll(buildInfo)
+                                .add(new CategoryItem("Macro"))
+                                .add(new ActionItem("Show Macro", DebugOption.SHOW_MACRO))
                                 .add(new CategoryItem("OKHTTP options"))
                                 .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, DebugInterceptor.getEmptyResponse(), true))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
@@ -537,6 +540,15 @@ public class DebugPresenter {
                     }
                 });
 
+        showMacroObservable = actionSubject
+                .filter(new Func1<Integer, Boolean>() {
+                            @Override
+                            public Boolean call(Integer integer) {
+                                return integer.equals(DebugOption.SHOW_MACRO);
+                            }
+                        }
+                );
+
     }
 
     @Nonnull
@@ -608,5 +620,10 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Integer> getShowRequestObservable() {
         return showRequestObservable;
+    }
+
+    @Nonnull
+    public Observable<Integer> getShowMacroObservable() {
+        return showMacroObservable;
     }
 }

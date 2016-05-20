@@ -29,9 +29,6 @@ public class DebugInterceptor {
         String emptyJson;
         Request request = chain.request();
         Response response = chain.proceed(request);
-        if (!getDebugPreferences().getMockState()) {
-            return response;
-        }
 
         final String key = request.url().toString();
         if (requestCounter.containsKey(key)) {
@@ -39,6 +36,11 @@ public class DebugInterceptor {
         } else {
             requestCounter.put(key, 1);
         }
+
+        if (!getDebugPreferences().getMockState()) {
+            return response;
+        }
+
         long t1 = System.nanoTime();
         Log.d("DebugHelper", String.format("Sending request %s on %s%n%s",
                 request.url(), chain.connection(), request.headers()));

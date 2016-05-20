@@ -32,10 +32,10 @@ public class InfoListFragment extends DialogFragment {
 
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recylcerview);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.info_recyclerview);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        final MyAdapter adapter = new MyAdapter(DebugInterceptor.getRequestCounter());
+        final CountAdapter adapter = new CountAdapter(DebugInterceptor.getRequestCounter());
         recyclerView.setAdapter(adapter);
 
         clearButton = (Button) rootView.findViewById(R.id.clear_counter_button);

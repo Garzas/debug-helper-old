@@ -10,10 +10,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> {
     private final ArrayList<Map.Entry<String,Integer>> mData;
 
-    public MyAdapter(Map<String, Integer> map) {
+    public CountAdapter(Map<String, Integer> map) {
         mData = new ArrayList();
         mData.addAll(map.entrySet());
     }

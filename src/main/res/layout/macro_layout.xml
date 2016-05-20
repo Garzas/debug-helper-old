@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="24dp"
+    android:background="@color/debug_background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/macro_activity_name"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        tools:text="Activity name" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:text="Macro List"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:background="@android:color/white" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="Fill the gaps and click create macro to save fields "
+        android:textColor="@color/white" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/macro_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="singleChoice"
+        android:divider="@null"
+        android:scrollingCache="false" />
+
+    <Button
+        android:id="@+id/create_macro_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/debug_background"
+        android:text="CREATE MACRO FROM CURRENT ACTIVITY"
+        android:textColor="@color/white" />
+
+</LinearLayout>
