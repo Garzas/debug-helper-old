@@ -9,7 +9,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appunite.debughelper.macro.DebugAutoFill;
+import com.appunite.debughelper.macro.MacroItem;
 import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
@@ -62,7 +62,6 @@ public class DebugHelper {
         mainFrame.addView(child);
         final ScalpelFrameLayout scalpelFrame = (ScalpelFrameLayout) mainFrame;
         final DebugAdapter debugAdapter = new DebugAdapter(debugPreferences);
-        DebugAutoFill autoFill = new DebugAutoFill(child, mActivity.hashCode());
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
 
@@ -156,7 +155,7 @@ public class DebugHelper {
                             public void call(Integer integer) {
                                 mActivity.getFragmentManager()
                                         .beginTransaction()
-                                        .add(InfoListFragment.newInstance(), "TAG")
+                                        .add(InfoListFragment.newInstance(), "REQUEST_COUNTER")
                                         .disallowAddToBackStack()
                                         .commit();
                             }
@@ -167,7 +166,7 @@ public class DebugHelper {
                             public void call(Integer integer) {
                                 mActivity.getFragmentManager()
                                         .beginTransaction()
-                                        .add(MacroFragment.newInstance(), "MACRO")
+                                        .add(MacroFragment.newInstance(), "MACRO_FRAGMENT")
                                         .disallowAddToBackStack()
                                         .commit();
                             }

@@ -2,8 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
+    <ImageButton
+        android:id="@+id/use_macro"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:src="@drawable/ic_play_arrow_white_24dp" />
 
     <TextView
         android:id="@+id/macro_name"
@@ -11,15 +18,20 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Macro" />
+        android:text="Macro"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
 
-    <Button
+    <ImageButton
+        android:id="@+id/edit_macro"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="EDIT NAME" />
+        android:layout_height="42dp"
+        android:src="@drawable/ic_mode_edit_white_24dp" />
 
-    <Button
+    <ImageButton
+        android:id="@+id/remove_macro"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="DELETE" />
+        android:layout_height="42dp"
+        android:src="@drawable/ic_delete_white_24dp" />
+
 </LinearLayout>

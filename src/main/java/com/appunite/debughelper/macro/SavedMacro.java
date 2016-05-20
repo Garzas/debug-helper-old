@@ -1,12 +1,14 @@
 package com.appunite.debughelper.macro;
 
+import javax.annotation.Nonnull;
+
 public class SavedMacro {
 
-    private final int idView;
+    private Integer idView;
     private String text;
-    private boolean checked;
+    private Boolean checked;
 
-    public SavedMacro(int idView, String text) {
+    public SavedMacro(Integer idView, String text) {
         this.idView = idView;
         this.text = text;
     }
@@ -16,7 +18,8 @@ public class SavedMacro {
         this.checked = checked;
     }
 
-    public int getIdView() {
+    @Nonnull
+    public Integer getIdView() {
         return idView;
     }
 
@@ -24,7 +27,7 @@ public class SavedMacro {
         return text;
     }
 
-    public boolean isChecked() {
+    public Boolean isChecked() {
         return checked;
     }
 }

@@ -1,36 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_margin="24dp"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="24dp"
     android:background="@color/debug_background"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/macro_activity_name"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        tools:text="Activity name" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:text="Macro List"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:background="@android:color/white" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:text="Macro List"/>
-
-    <View
-        android:layout_marginTop="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="8dp"
-        android:background="@android:color/white"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="Fill the gaps and click create macro to save fields "
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/white"/>
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="Fill the gaps and click create macro to save fields "
+        android:textColor="@color/white" />
 
 
     <android.support.v7.widget.RecyclerView
@@ -38,16 +48,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scrollingCache="false"
+        android:choiceMode="singleChoice"
         android:divider="@null"
-        android:choiceMode="singleChoice"/>
+        android:scrollingCache="false" />
 
     <Button
         android:id="@+id/create_macro_button"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/debug_background"
-        android:textColor="@color/white"
-        android:text="CREATE MACRO FROM CURRENT ACTIVITY"/>
+        android:text="CREATE MACRO FROM CURRENT ACTIVITY"
+        android:textColor="@color/white" />
 
 </LinearLayout>

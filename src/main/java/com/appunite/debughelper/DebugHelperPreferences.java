@@ -11,12 +11,19 @@ public class DebugHelperPreferences {
     private static final String DEBUG_DRAWER_PREFS = "debug_drawer_prefs";
     private static final String DEBUG_MODE = "debug_helper_mode_status";
     private static final String MOCK_MODE = "debug_helper_mock_mode_status";
+    private static final String DEBUG_MACRO = "debug_helper_macro_list";
 
     @Nonnull
     private final SharedPreferences sharedPreferences;
 
     public DebugHelperPreferences(@Nonnull Context context) {
         sharedPreferences = context.getSharedPreferences(DEBUG_DRAWER_PREFS, 0);
+    }
+
+    public void saveMacroList(String jsonArray) {
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(DEBUG_MACRO, jsonArray);
+        editor.apply();
     }
 
 
@@ -36,6 +43,10 @@ public class DebugHelperPreferences {
         return sharedPreferences.getBoolean(DEBUG_MODE, true);
     }
 
+    public String getMacroList() {
+        return sharedPreferences.getString(DEBUG_MACRO, "[]");
+    }
+
     public boolean getMockState() {
         return sharedPreferences.getBoolean(MOCK_MODE, false);
     }
@@ -44,8 +55,7 @@ public class DebugHelperPreferences {
         boolean mockState = sharedPreferences.getBoolean(MOCK_MODE, false);
         if (mockState) {
             return View.VISIBLE;
-        }
-        else {
+        } else {
             return View.GONE;
         }
     }
