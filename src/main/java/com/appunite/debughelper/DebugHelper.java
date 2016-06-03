@@ -9,7 +9,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appunite.debughelper.macro.MacroItem;
 import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
@@ -33,52 +32,78 @@ public class DebugHelper {
         return true;
     }
 
-    private static Activity mActivity;
+    private static Activity currentActivity;
     private static SerialSubscription subscription = new SerialSubscription();
     private static DebugPresenter debugPresenter = null;
-    static DebugHelperPreferences debugPreferences;
+    private static ScalpelFrameLayout scalpelFrame;
+    private static DebugHelperPreferences debugPreferences;
+    private static DebugAdapter debugAdapter;
+    private static DisplayMetrics metrics;
+    private static ViewGroup mainFrame;
+    private static RecyclerView debugRecyclerView;
 
     public static void setActivity(Activity activity) {
-        mActivity = activity;
-        debugPreferences = new DebugHelperPreferences(mActivity.getApplicationContext());
-        debugPresenter = new DebugPresenter(mActivity);
+        currentActivity = activity;
+        debugPreferences = new DebugHelperPreferences(currentActivity.getApplicationContext());
+        debugPresenter = new DebugPresenter(currentActivity);
         if (debugPreferences.getDebugState()) {
-            LeakCanary.install(mActivity.getApplication());
+            LeakCanary.install(currentActivity.getApplication());
         }
+        debugAdapter = new DebugAdapter(debugPreferences);
     }
 
 
     @Nonnull
     public static View setContentView(int childId) {
-        final View child = mActivity.getLayoutInflater().inflate(childId, null);
+        final View child = currentActivity.getLayoutInflater().inflate(childId, null);
         return setContentView(child);
     }
 
     @Nonnull
     public static View setContentView(@Nonnull View child) {
-        final View root = mActivity.getLayoutInflater().inflate(R.layout.debug_layout, null);
-        final ViewGroup mainFrame = (ViewGroup) root.findViewById(R.id.main_frame);
+        final View root = currentActivity.getLayoutInflater().inflate(R.layout.debug_layout, null);
+
+        mainFrame = (ViewGroup) root.findViewById(R.id.main_frame);
         mainFrame.removeAllViews();
         mainFrame.addView(child);
-        final ScalpelFrameLayout scalpelFrame = (ScalpelFrameLayout) mainFrame;
-        final DebugAdapter debugAdapter = new DebugAdapter(debugPreferences);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(mActivity);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(currentActivity);
+        debugRecyclerView = (RecyclerView) root.findViewById(R.id.debug_drawer);
+        debugRecyclerView.setBackgroundColor(Color.parseColor("#cc222222"));
+        debugRecyclerView.setLayoutManager(layoutManager);
+        debugRecyclerView.setAdapter(debugAdapter);
 
-        RecyclerView debugRecyclerView = (RecyclerView) root.findViewById(R.id.debug_drawer);
+        return root;
+    }
+
+    public static void reSubscribe(final Activity activity) {
+        debugPreferences = new DebugHelperPreferences(activity.getApplicationContext());
+        debugPresenter = new DebugPresenter(activity);
+
+        final ViewGroup mainView = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+
+        final ViewGroup debugView = (ViewGroup) mainView.getChildAt(0);
+        scalpelFrame = (ScalpelFrameLayout) debugView.getChildAt(0);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+
+        debugRecyclerView = (RecyclerView) debugView.findViewById(R.id.debug_drawer);
         debugRecyclerView.setBackgroundColor(Color.parseColor("#cc222222"));
 
         debugRecyclerView.setLayoutManager(layoutManager);
         debugRecyclerView.setAdapter(debugAdapter);
 
-        final DisplayMetrics metrics = new DisplayMetrics();
-        mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        TinyDancer.create().show(activity.getApplicationContext());
+        TinyDancer.hide(activity.getApplicationContext());
 
         subscription.set(Subscriptions.from(
                 debugPresenter.simpleListObservable()
                         .subscribe(debugAdapter),
 
-                Observable.just(mActivity.getResources().getDisplayMetrics().density * 160f)
+                Observable.just(activity.getResources().getDisplayMetrics().density * 160f)
                         .subscribe(debugPresenter.densityObserver()),
 
                 Observable.just(metrics.widthPixels + "x" + metrics.heightPixels)
@@ -113,10 +138,10 @@ public class DebugHelper {
                             @Override
                             public void call(Boolean isSet) {
                                 if (isSet) {
-                                    TinyDancer.create().show(mActivity.getApplicationContext());
+                                    TinyDancer.create().show(activity.getApplicationContext());
                                 } else {
-                                    TinyDancer.create().show(mActivity.getApplicationContext());
-                                    TinyDancer.hide(mActivity.getApplicationContext());
+                                    TinyDancer.create().show(activity.getApplicationContext());
+                                    TinyDancer.hide(activity.getApplicationContext());
                                 }
                             }
                         }),
@@ -127,8 +152,8 @@ public class DebugHelper {
                             public void call(Object o) {
                                 LynxConfig lynxConfig = new LynxConfig();
                                 lynxConfig.setMaxNumberOfTracesToShow(4000);
-                                Intent lynxActivityIntent = LynxActivity.getIntent(mActivity, lynxConfig);
-                                mActivity.startActivity(lynxActivityIntent);
+                                Intent lynxActivityIntent = LynxActivity.getIntent(activity, lynxConfig);
+                                activity.startActivity(lynxActivityIntent);
                             }
                         }),
 
@@ -137,7 +162,7 @@ public class DebugHelper {
                             @Override
                             public void call(Boolean aBoolean) {
                                 DebugInterceptor.setEmptyResponse(aBoolean);
-                                mActivity.recreate();
+                                activity.recreate();
                             }
                         }),
 
@@ -145,7 +170,7 @@ public class DebugHelper {
                         .subscribe(new Action1<SelectOption>() {
                             @Override
                             public void call(SelectOption selectOption) {
-                                OptionsDialog.newInstance(selectOption).show(mActivity.getFragmentManager(), null);
+                                OptionsDialog.newInstance(selectOption).show(activity.getFragmentManager(), null);
                             }
                         }),
 
@@ -153,7 +178,7 @@ public class DebugHelper {
                         .subscribe(new Action1<Integer>() {
                             @Override
                             public void call(Integer integer) {
-                                mActivity.getFragmentManager()
+                                activity.getFragmentManager()
                                         .beginTransaction()
                                         .add(InfoListFragment.newInstance(), "REQUEST_COUNTER")
                                         .disallowAddToBackStack()
@@ -164,7 +189,7 @@ public class DebugHelper {
                         .subscribe(new Action1<Integer>() {
                             @Override
                             public void call(Integer integer) {
-                                mActivity.getFragmentManager()
+                                activity.getFragmentManager()
                                         .beginTransaction()
                                         .add(MacroFragment.newInstance(), "MACRO_FRAGMENT")
                                         .disallowAddToBackStack()
@@ -175,23 +200,17 @@ public class DebugHelper {
                         .subscribe(new Action1<Object>() {
                             @Override
                             public void call(Object o) {
-                                mActivity.recreate();
+                                activity.recreate();
                             }
                         })
 
         ));
-
-        return root;
     }
 
-    public static void onDestroy() {
+    public static void unSubscribe() {
         subscription.set(Subscriptions.empty());
     }
 
-    public static void onResume() {
-        TinyDancer.create().show(mActivity.getApplicationContext());
-        TinyDancer.hide(mActivity.getApplicationContext());
-    }
 
     @Nonnull
     public static Interceptor getResponseInterceptor() {
@@ -207,6 +226,6 @@ public class DebugHelper {
             case DebugOption.SET_HTTP_CODE:
                 DebugInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
         }
-        mActivity.recreate();
+        debugAdapter.notifyDataSetChanged();
     }
 }

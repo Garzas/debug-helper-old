@@ -15,7 +15,6 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Opt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DebugHelper.setActivity(this);
-
     }
 
     @Override
@@ -34,15 +33,15 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Opt
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        DebugHelper.onDestroy();
+    protected void onPause() {
+        super.onPause();
+        DebugHelper.unSubscribe();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        DebugHelper.onResume();
+        DebugHelper.reSubscribe(this);
     }
 
     @Override
