@@ -6,7 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.appunite.debughelper.SelectOption;
+import com.appunite.debughelper.model.SelectOption;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
