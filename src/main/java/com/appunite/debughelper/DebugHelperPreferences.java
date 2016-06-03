@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 public class DebugHelperPreferences {
 
     private static final String DEBUG_DRAWER_PREFS = "debug_drawer_prefs";
-    private static final String DEBUG_MODE = "debug_helper_mode_status";
     private static final String MOCK_MODE = "debug_helper_mock_mode_status";
     private static final String DEBUG_MACRO = "debug_helper_macro_list";
 
@@ -26,21 +25,10 @@ public class DebugHelperPreferences {
         editor.apply();
     }
 
-
-    public void saveDebugState(boolean state) {
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(DEBUG_MODE, state);
-        editor.apply();
-    }
-
     public void saveMockState(boolean state) {
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(MOCK_MODE, state);
         editor.apply();
-    }
-
-    public boolean getDebugState() {
-        return sharedPreferences.getBoolean(DEBUG_MODE, true);
     }
 
     public String getMacroList() {
