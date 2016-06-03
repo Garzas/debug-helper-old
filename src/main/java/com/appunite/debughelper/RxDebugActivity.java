@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 

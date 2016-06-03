@@ -264,6 +264,10 @@ public class DebugTools {
         }
     }
 
+    public static Boolean isDebuggable(Context context) {
+        return (0 != (context.getApplicationInfo().flags & context.getApplicationInfo().FLAG_DEBUGGABLE));
+    }
+
     public static String getApplicationName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);

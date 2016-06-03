@@ -232,7 +232,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
                             .filter(new Func1<Boolean, Boolean>() {
                                 @Override
                                 public Boolean call(Boolean aBoolean) {
-                                    return switchItem.getOption() == DebugOption.SET_EMPTY_RESPONSE;
+                                    return (switchItem.getOption() == DebugOption.SET_EMPTY_RESPONSE
+                                            || switchItem.getOption() == DebugOption.FPS_LABEL);
                                 }
                             })
                             .subscribe(RxCompoundButton.checked(debugSwitch)),

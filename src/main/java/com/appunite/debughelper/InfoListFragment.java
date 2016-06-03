@@ -28,7 +28,7 @@ public class InfoListFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_layout, container, true);
+        View rootView = inflater.inflate(R.layout.debug_fragment_layout, container, true);
 
 
         mLayoutManager = new LinearLayoutManager(getActivity());

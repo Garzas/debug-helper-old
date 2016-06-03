@@ -1,6 +1,8 @@
 package com.appunite.debughelper;
 
 import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appunite.debughelper.macro.MacroFragment;
+import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.utils.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
@@ -27,6 +30,9 @@ import rx.subscriptions.Subscriptions;
 
 public class DebugHelper {
 
+
+    private static Context appContext;
+    private static Boolean fpsVisibility = false;
 
     public Boolean isWorking() {
         return true;
@@ -46,9 +52,6 @@ public class DebugHelper {
         currentActivity = activity;
         debugPreferences = new DebugHelperPreferences(currentActivity.getApplicationContext());
         debugPresenter = new DebugPresenter(currentActivity);
-        if (debugPreferences.getDebugState()) {
-            LeakCanary.install(currentActivity.getApplication());
-        }
         debugAdapter = new DebugAdapter(debugPreferences);
     }
 
@@ -96,9 +99,6 @@ public class DebugHelper {
         metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        TinyDancer.create().show(activity.getApplicationContext());
-        TinyDancer.hide(activity.getApplicationContext());
-
         subscription.set(Subscriptions.from(
                 debugPresenter.simpleListObservable()
                         .subscribe(debugAdapter),
@@ -138,11 +138,11 @@ public class DebugHelper {
                             @Override
                             public void call(Boolean isSet) {
                                 if (isSet) {
-                                    TinyDancer.create().show(activity.getApplicationContext());
+                                    TinyDancer.create().show(appContext);
                                 } else {
-                                    TinyDancer.create().show(activity.getApplicationContext());
-                                    TinyDancer.hide(activity.getApplicationContext());
+                                    TinyDancer.hide(appContext);
                                 }
+                                fpsVisibility = isSet;
                             }
                         }),
 
@@ -211,6 +211,14 @@ public class DebugHelper {
         subscription.set(Subscriptions.empty());
     }
 
+    public static void install(Context context) {
+        appContext = context;
+       if(DebugTools.isDebuggable(context)) {
+           LeakCanary.install((Application) context);
+
+       }
+    }
+
 
     @Nonnull
     public static Interceptor getResponseInterceptor() {
@@ -219,6 +227,10 @@ public class DebugHelper {
 
     public static DebugHelperPreferences getDebugPreferences() {
         return debugPreferences;
+    }
+
+    public static Boolean isFpsVisible() {
+        return fpsVisibility;
     }
 
     public static void updateOption(SelectOption option) {

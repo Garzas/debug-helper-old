@@ -5,6 +5,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 
+import com.appunite.debughelper.model.SelectOption;
+import com.appunite.debughelper.model.SwitchOption;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
@@ -421,8 +423,8 @@ public class DebugPresenter {
                     @Override
                     public List<BaseDebugItem> call(Object o) {
                         return ImmutableList.<BaseDebugItem>of(
-                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL, false),
-                                new InformationItem("LeakCanary", "disabled"),
+                                new SwitchItem("FPS Label", DebugOption.FPS_LABEL, DebugHelper.isFpsVisible(), false),
+                                new InformationItem("LeakCanary", "enabled"),
                                 new ActionItem("Show Log", DebugOption.SHOW_LOG));
                     }
                 });
