@@ -10,10 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.appunite.debughelper.adapter.CountAdapter;
+import com.appunite.debughelper.interceptor.DebugInterceptor;
+
 
 public class InfoListFragment extends DialogFragment {
-     RecyclerView recyclerView;
-     RecyclerView.LayoutManager mLayoutManager;
+
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
     Button clearButton;
 
     public static Fragment newInstance() {

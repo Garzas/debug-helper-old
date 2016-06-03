@@ -1,21 +1,22 @@
-package com.appunite.debughelper;
+package com.appunite.debughelper.base;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.DebugHelper;
 import com.appunite.debughelper.model.SelectOption;
-import com.appunite.debughelper.utils.OptionsDialog;
-import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.appunite.debughelper.dialog.OptionsDialog;
 
 
-
-public abstract class RxDebugActivity extends RxAppCompatActivity implements OptionsDialog.OnSelectOptionListener {
+public abstract class DebugActivity extends AppCompatActivity implements OptionsDialog.OnSelectOptionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DebugHelper.setActivity(this);
+
     }
 
     @Override

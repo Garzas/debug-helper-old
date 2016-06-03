@@ -11,9 +11,15 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appunite.debughelper.adapter.DebugAdapter;
+import com.appunite.debughelper.interceptor.DebugInterceptor;
+import com.appunite.debughelper.interceptor.SampleInterceptor;
 import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.model.SelectOption;
-import com.appunite.debughelper.utils.OptionsDialog;
+import com.appunite.debughelper.presenter.DebugPresenter;
+import com.appunite.debughelper.utils.DebugOption;
+import com.appunite.debughelper.utils.DebugTools;
+import com.appunite.debughelper.dialog.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
 import com.github.pedrovgs.lynx.LynxConfig;

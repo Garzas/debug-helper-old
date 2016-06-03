@@ -1,10 +1,14 @@
-package com.appunite.debughelper;
+package com.appunite.debughelper.presenter;
 
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 
+import com.appunite.debughelper.DebugHelper;
+import com.appunite.debughelper.interceptor.DebugInterceptor;
+import com.appunite.debughelper.utils.DebugOption;
+import com.appunite.debughelper.utils.DebugTools;
 import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.model.SwitchOption;
 import com.google.common.base.Objects;

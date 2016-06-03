@@ -1,4 +1,4 @@
-package com.appunite.debughelper;
+package com.appunite.debughelper.utils;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

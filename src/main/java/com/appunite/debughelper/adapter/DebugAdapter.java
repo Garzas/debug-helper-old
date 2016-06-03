@@ -1,4 +1,4 @@
-package com.appunite.debughelper;
+package com.appunite.debughelper.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +9,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.appunite.debughelper.DebugHelperPreferences;
+import com.appunite.debughelper.utils.DebugOption;
+import com.appunite.debughelper.R;
+import com.appunite.debughelper.interceptor.DebugInterceptor;
+import com.appunite.debughelper.presenter.DebugPresenter;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;

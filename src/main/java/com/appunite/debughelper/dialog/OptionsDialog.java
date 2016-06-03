@@ -1,4 +1,4 @@
-package com.appunite.debughelper.utils;
+package com.appunite.debughelper.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
