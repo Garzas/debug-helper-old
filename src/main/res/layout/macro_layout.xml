@@ -13,7 +13,7 @@
         android:layout_height="36dp"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:textStyle="bold"
         tools:text="Activity name" />
 
@@ -22,7 +22,7 @@
         android:layout_height="30dp"
         android:layout_margin="6dp"
         android:gravity="center"
-        android:text="Macro List"
+        android:text="@string/macro_list"
         android:textColor="@android:color/white"
         android:textSize="18sp" />
 
@@ -39,7 +39,7 @@
         android:layout_marginBottom="16dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:text="Fill the gaps and click create macro to save fields "
+        android:text="@string/macro_guide"
         android:textColor="@android:color/white" />
 
 
@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/debug_background"
-        android:text="CREATE MACRO FROM CURRENT ACTIVITY"
+        android:text="@string/create_macro"
         android:textColor="@android:color/white" />
 
 </LinearLayout>

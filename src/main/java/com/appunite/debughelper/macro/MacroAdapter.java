@@ -28,14 +28,21 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
     }
 
     @Override
-    public void onBindViewHolder(MacroHolder holder, final int position) {
-        holder.macroName.setText(mData.get(position).getMacroList().get(0).getText());
+    public void onBindViewHolder(final MacroHolder holder, final int position) {
+        holder.macroName.setText(mData.get(position).getMacroName());
         holder.useMacro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
                     listener.useMacro(position);
                 }
+            }
+        });
+
+        holder.editMacro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.editMacro(position, holder.macroName.getText().toString());
             }
         });
     }
@@ -66,9 +73,8 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
     }
 
     public interface UseMacroListener {
-
         void useMacro(int position);
-
+        void editMacro(int position, String name);
     }
 
 }

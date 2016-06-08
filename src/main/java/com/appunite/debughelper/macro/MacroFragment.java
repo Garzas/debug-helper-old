@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.appunite.debughelper.DebugHelperPreferences;
 import com.appunite.debughelper.R;
+import com.appunite.debughelper.dialog.EditDialog;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,13 +26,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MacroFragment extends DialogFragment implements MacroAdapter.UseMacroListener {
+public class MacroFragment extends DialogFragment
+        implements MacroAdapter.UseMacroListener, EditDialog.OnChangeNameListener {
 
     private Context mContext;
     private DebugHelperPreferences debugHelperPreferences;
     private List<MacroItem> macroItems;
     private List<SavedMacro> savedMacros;
     private ViewGroup viewGroup;
+    private MacroAdapter adapter = new MacroAdapter(this, macroItems);
 
     RecyclerView recyclerView;
     Button createMacroButton;
@@ -60,7 +63,8 @@ public class MacroFragment extends DialogFragment implements MacroAdapter.UseMac
         activityName = (TextView) rootView.findViewById(R.id.macro_activity_name);
 
         macroItems = getMacroItems();
-        final MacroAdapter adapter = new MacroAdapter(this, macroItems);
+
+        adapter = new MacroAdapter(this, macroItems);
         recyclerView.setAdapter(adapter);
         activityName.setText(getActivity().getClass().getSimpleName());
 
@@ -132,4 +136,16 @@ public class MacroFragment extends DialogFragment implements MacroAdapter.UseMac
         doMacro(position);
     }
 
+    @Override
+    public void editMacro(int position, String name) {
+        EditDialog editDialog = EditDialog.newInstance(position, name);
+        editDialog.setTargetFragment(this, 0);
+        editDialog.show(this.getFragmentManager(), "EditMacro");
+    }
+
+    @Override
+    public void onChangeName(int position, String newName) {
+        macroItems.get(position).setMacroName(newName);
+        adapter.update(macroItems);
+    }
 }
