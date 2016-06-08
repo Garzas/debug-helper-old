@@ -45,6 +45,18 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
                 listener.editMacro(position, holder.macroName.getText().toString());
             }
         });
+
+        holder.deleteMacro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteMacro(position);
+            }
+        });
+    }
+
+    private void deleteMacro(int position) {
+        mData.remove(position);
+        notifyDataSetChanged();
     }
 
     @Override

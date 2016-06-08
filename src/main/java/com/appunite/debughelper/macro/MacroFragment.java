@@ -146,6 +146,7 @@ public class MacroFragment extends DialogFragment
     @Override
     public void onChangeName(int position, String newName) {
         macroItems.get(position).setMacroName(newName);
+        saveMacros(macroItems);
         adapter.update(macroItems);
     }
 }
