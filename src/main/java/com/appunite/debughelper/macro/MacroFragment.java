@@ -32,7 +32,7 @@ public class MacroFragment extends DialogFragment
     private Context mContext;
     private DebugHelperPreferences debugHelperPreferences;
     private List<MacroItem> macroItems;
-    private List<SavedMacro> savedFields;
+    private List<SavedField> savedFields;
     private ViewGroup viewGroup;
     private MacroAdapter adapter = new MacroAdapter(this, macroItems);
 
@@ -82,8 +82,8 @@ public class MacroFragment extends DialogFragment
         return rootView;
     }
 
-    public List<SavedMacro> createMacro(View view) {
-        final List<SavedMacro> macroModelList = new ArrayList<>();
+    public List<SavedField> createMacro(View view) {
+        final List<SavedField> macroModelList = new ArrayList<>();
         if (view instanceof RecyclerView) {
 //            RecyclerView recyclerView = (RecyclerView) view;
 //            for (int i = 0; i < recyclerView.getAdapter().getItemCount(); i++) {
@@ -100,36 +100,38 @@ public class MacroFragment extends DialogFragment
             }
         } else if (view instanceof EditText) {
             EditText editText = (EditText) view;
-            macroModelList.add(new SavedMacro(editText.getId(), editText.getText().toString()));
+            macroModelList.add(new SavedField(editText.getId(), editText.getText().toString()));
         } else if (view instanceof CompoundButton) {
             CompoundButton button = (CompoundButton) view;
-            macroModelList.add(new SavedMacro(button.getId(), button.isChecked()));
+            macroModelList.add(new SavedField(button.getId(), button.isChecked()));
         }
 
         return macroModelList;
     }
 
+    public List<SavedField>
+
     public void doMacro(int position) {
-        List<SavedMacro> macros = macroItems.get(position).getMacroList();
-        List<SavedMacro> changedViews = new ArrayList<>();
+        List<SavedField> macros = macroItems.get(position).getMacroList();
+        List<SavedField> changedViews = new ArrayList<>();
         for (int i = 0; i < macros.size(); i++) {
-            final SavedMacro savedMacro = macros.get(i);
-            View view = viewGroup.findViewById(savedMacro.getIdView());
+            final SavedField savedField = macros.get(i);
+            View view = viewGroup.findViewById(savedField.getIdView());
             if (view instanceof EditText) {
                 EditText editText = (EditText) view;
-                editText.setText(savedMacro.getText());
+                editText.setText(savedField.getText());
             } else if (view instanceof CompoundButton) {
                 CompoundButton compoundButton = (CompoundButton) view;
-                compoundButton.setChecked(savedMacro.isChecked());
+                compoundButton.setChecked(savedField.isChecked());
 
             } else {
-                changedViews.add(savedMacro);
+                changedViews.add(savedField);
             }
             //TODO MACRO OTHER VIEWS
         }
 
         if (changedViews.isEmpty()) {
-            List<SavedMacro> filteredMacros = savedFields;
+            List<SavedField> filteredMacros = savedFields;
             for (int k = 0; k < changedViews.size(); k++) {
                 for (int j = 0; j < filteredMacros.size(); j++) {
                     if (changedViews.get(k).getIdView().equals(filteredMacros.get(j).getIdView())) {

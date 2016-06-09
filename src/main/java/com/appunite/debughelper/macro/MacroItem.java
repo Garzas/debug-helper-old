@@ -4,18 +4,18 @@ import java.util.List;
 
 public class MacroItem {
 
-    private List<SavedMacro> macroList;
+    private List<SavedField> macroList;
     private int hashCode;
     private String macroName;
 
 
-    public MacroItem(List<SavedMacro> macroList, int activityHashCode) {
+    public MacroItem(List<SavedField> macroList, int activityHashCode) {
         this.macroList = macroList;
         hashCode = activityHashCode;
         macroName = "Macro";
     }
 
-    public List<SavedMacro> getMacroList() {
+    public List<SavedField> getMacroList() {
         return macroList;
     }
 

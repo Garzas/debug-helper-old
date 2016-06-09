@@ -2,18 +2,18 @@ package com.appunite.debughelper.macro;
 
 import javax.annotation.Nonnull;
 
-public class SavedMacro {
+public class SavedField {
 
     private Integer idView;
     private String text;
     private Boolean checked;
 
-    public SavedMacro(Integer idView, String text) {
+    public SavedField(Integer idView, String text) {
         this.idView = idView;
         this.text = text;
     }
 
-    public SavedMacro(int idView, boolean checked) {
+    public SavedField(int idView, boolean checked) {
         this.idView = idView;
         this.checked = checked;
     }
