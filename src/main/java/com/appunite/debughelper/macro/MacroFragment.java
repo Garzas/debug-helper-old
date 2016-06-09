@@ -109,7 +109,6 @@ public class MacroFragment extends DialogFragment
         return macroModelList;
     }
 
-    public List<SavedField>
 
     public void doMacro(int position) {
         List<SavedField> macros = macroItems.get(position).getMacroList();
