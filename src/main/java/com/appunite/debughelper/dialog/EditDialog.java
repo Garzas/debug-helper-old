@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.EditText;
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ public class EditDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final EditText editText = new EditText(getActivity());
         editText.setText(currentName);
+        editText.setTextColor(Color.WHITE);
 
         return new AlertDialog.Builder(getActivity(), android.R.style.Theme_DeviceDefault_Dialog)
                 .setView(editText)

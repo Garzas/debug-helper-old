@@ -27,12 +27,12 @@ import java.util.List;
 
 
 public class MacroFragment extends DialogFragment
-        implements MacroAdapter.UseMacroListener, EditDialog.OnChangeNameListener {
+        implements MacroAdapter.MacroListener, EditDialog.OnChangeNameListener {
 
     private Context mContext;
     private DebugHelperPreferences debugHelperPreferences;
     private List<MacroItem> macroItems;
-    private List<SavedMacro> savedMacros;
+    private List<SavedMacro> savedFields;
     private ViewGroup viewGroup;
     private MacroAdapter adapter = new MacroAdapter(this, macroItems);
 
@@ -71,9 +71,9 @@ public class MacroFragment extends DialogFragment
         createMacroButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                savedMacros = createMacro(viewGroup.getChildAt(0));
+                savedFields = createMacro(viewGroup.getChildAt(0));
 
-                macroItems.add(new MacroItem(savedMacros, mContext.hashCode()));
+                macroItems.add(new MacroItem(savedFields, mContext.hashCode()));
                 adapter.update(macroItems);
                 saveMacros(macroItems);
             }
@@ -84,14 +84,20 @@ public class MacroFragment extends DialogFragment
 
     public List<SavedMacro> createMacro(View view) {
         final List<SavedMacro> macroModelList = new ArrayList<>();
-        if (view instanceof ViewGroup) {
+        if (view instanceof RecyclerView) {
+//            RecyclerView recyclerView = (RecyclerView) view;
+//            for (int i = 0; i < recyclerView.getAdapter().getItemCount(); i++) {
+//                View recView = recyclerView.getChildAt(i);
+//                macroModelList.addAll(createMacro(recView));
+//            }
+            //TODO recyclerview and spinner function
+        } else if (view instanceof ViewGroup) {
             ViewGroup parentView = (ViewGroup) view;
             final int childCount = parentView.getChildCount();
 
             for (int i = 0; i < childCount; i++) {
                 macroModelList.addAll(createMacro(parentView.getChildAt(i)));
             }
-
         } else if (view instanceof EditText) {
             EditText editText = (EditText) view;
             macroModelList.add(new SavedMacro(editText.getId(), editText.getText().toString()));
@@ -105,14 +111,35 @@ public class MacroFragment extends DialogFragment
 
     public void doMacro(int position) {
         List<SavedMacro> macros = macroItems.get(position).getMacroList();
+        List<SavedMacro> changedViews = new ArrayList<>();
         for (int i = 0; i < macros.size(); i++) {
             final SavedMacro savedMacro = macros.get(i);
             View view = viewGroup.findViewById(savedMacro.getIdView());
             if (view instanceof EditText) {
                 EditText editText = (EditText) view;
                 editText.setText(savedMacro.getText());
+            } else if (view instanceof CompoundButton) {
+                CompoundButton compoundButton = (CompoundButton) view;
+                compoundButton.setChecked(savedMacro.isChecked());
+
+            } else {
+                changedViews.add(savedMacro);
             }
             //TODO MACRO OTHER VIEWS
+        }
+
+        if (changedViews.isEmpty()) {
+            List<SavedMacro> filteredMacros = savedFields;
+            for (int k = 0; k < changedViews.size(); k++) {
+                for (int j = 0; j < filteredMacros.size(); j++) {
+                    if (changedViews.get(k).getIdView().equals(filteredMacros.get(j).getIdView())) {
+                        filteredMacros.remove(j);
+                        break;
+                    }
+                }
+            }
+
+            //TODO show views not found or implement overriding method
         }
     }
 
@@ -141,6 +168,13 @@ public class MacroFragment extends DialogFragment
         EditDialog editDialog = EditDialog.newInstance(position, name);
         editDialog.setTargetFragment(this, 0);
         editDialog.show(this.getFragmentManager(), "EditMacro");
+    }
+
+    @Override
+    public void deleteMacro(int position) {
+        macroItems.remove(position);
+        saveMacros(macroItems);
+        adapter.update(macroItems);
     }
 
     @Override

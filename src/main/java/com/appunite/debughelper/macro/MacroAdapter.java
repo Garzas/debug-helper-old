@@ -14,9 +14,9 @@ import java.util.List;
 public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder> {
 
     private List<MacroItem> mData;
-    private UseMacroListener listener;
+    private MacroListener listener;
 
-    public MacroAdapter(UseMacroListener listener, List<MacroItem> macroItems) {
+    public MacroAdapter(MacroListener listener, List<MacroItem> macroItems) {
         this.listener = listener;
         mData = macroItems;
     }
@@ -28,13 +28,13 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
     }
 
     @Override
-    public void onBindViewHolder(final MacroHolder holder, final int position) {
+    public void onBindViewHolder(final MacroHolder holder, int position) {
         holder.macroName.setText(mData.get(position).getMacroName());
         holder.useMacro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
-                    listener.useMacro(position);
+                    listener.useMacro(holder.getAdapterPosition());
                 }
             }
         });
@@ -42,21 +42,16 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
         holder.editMacro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.editMacro(position, holder.macroName.getText().toString());
+                listener.editMacro(holder.getAdapterPosition(), holder.macroName.getText().toString());
             }
         });
 
         holder.deleteMacro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteMacro(position);
+                listener.deleteMacro(holder.getAdapterPosition());
             }
         });
-    }
-
-    private void deleteMacro(int position) {
-        mData.remove(position);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -84,9 +79,10 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
         }
     }
 
-    public interface UseMacroListener {
+    public interface MacroListener {
         void useMacro(int position);
         void editMacro(int position, String name);
+        void deleteMacro(int position);
     }
 
 }
