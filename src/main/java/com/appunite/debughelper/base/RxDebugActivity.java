@@ -1,5 +1,6 @@
 package com.appunite.debughelper.base;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,9 +8,10 @@ import android.view.ViewGroup;
 import com.appunite.debughelper.DebugHelper;
 import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.dialog.OptionsDialog;
+import com.appunite.debughelper.utils.DebugPermissions;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
-
+import javax.annotation.Nonnull;
 
 public abstract class RxDebugActivity extends RxAppCompatActivity implements OptionsDialog.OnSelectOptionListener {
 
@@ -32,6 +34,28 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Opt
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(DebugHelper.setContentView(view), params);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode,
+                                           @Nonnull final String permissions[], @Nonnull final int[] grantResults) {
+        switch (requestCode) {
+            case DebugPermissions.SCREEN_ABOVE_OTHERS: {
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     @Override

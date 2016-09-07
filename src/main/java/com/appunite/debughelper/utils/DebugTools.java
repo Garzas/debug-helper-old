@@ -58,6 +58,8 @@ public class DebugTools {
                 return "Lollipop MR1";
             case 23:
                 return "Marshmallow";
+            case 24 :
+                return "Nougat";
             default:
                 return "Unknown";
         }

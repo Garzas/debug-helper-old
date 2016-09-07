@@ -5,6 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appunite.debughelper.adapter.DebugAdapter;
+import com.appunite.debughelper.dialog.OptionsDialog;
 import com.appunite.debughelper.interceptor.DebugInterceptor;
 import com.appunite.debughelper.interceptor.SampleInterceptor;
 import com.appunite.debughelper.macro.MacroFragment;
@@ -19,7 +23,6 @@ import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.presenter.DebugPresenter;
 import com.appunite.debughelper.utils.DebugOption;
 import com.appunite.debughelper.utils.DebugTools;
-import com.appunite.debughelper.dialog.OptionsDialog;
 import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.github.pedrovgs.lynx.LynxActivity;
 import com.github.pedrovgs.lynx.LynxConfig;
@@ -31,11 +34,11 @@ import javax.annotation.Nonnull;
 import okhttp3.Interceptor;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.subscriptions.SerialSubscription;
 import rx.subscriptions.Subscriptions;
 
 public class DebugHelper {
-
 
     private static Context appContext;
     private static Boolean fpsVisibility = false;
@@ -60,7 +63,6 @@ public class DebugHelper {
         debugPresenter = new DebugPresenter(currentActivity);
         debugAdapter = new DebugAdapter(debugPreferences);
     }
-
 
     @Nonnull
     public static View setContentView(int childId) {
@@ -140,12 +142,31 @@ public class DebugHelper {
                         }),
 
                 debugPresenter.getFpsLabelObservable()
+                        .filter(new Func1<Boolean, Boolean>() {
+                            @Override
+                            public Boolean call(final Boolean aBoolean) {
+                                return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(appContext);
+                            }
+                        })
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(final Boolean aBoolean) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        Uri.parse("package:" + appContext.getPackageName()));
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                appContext.startActivity(intent);
+                            }
+                        }),
+
+                debugPresenter.getFpsLabelObservable()
+                        .filter(canDrawOverlays())
                         .subscribe(new Action1<Boolean>() {
                             @Override
                             public void call(Boolean isSet) {
                                 if (isSet) {
                                     TinyDancer.create().show(appContext);
                                 } else {
+                                    //TODO fix nullpointer when permission not granted
                                     TinyDancer.hide(appContext);
                                 }
                                 fpsVisibility = isSet;
@@ -213,18 +234,26 @@ public class DebugHelper {
         ));
     }
 
+    private static Func1<Boolean, Boolean> canDrawOverlays() {
+        return new Func1<Boolean, Boolean>() {
+            @Override
+            public Boolean call(final Boolean aBoolean) {
+                return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(appContext);
+            }
+        };
+    }
+
     public static void unSubscribe() {
         subscription.set(Subscriptions.empty());
     }
 
     public static void install(Context context) {
         appContext = context;
-       if(DebugTools.isDebuggable(context)) {
-           LeakCanary.install((Application) context);
+        if (DebugTools.isDebuggable(context)) {
+            LeakCanary.install((Application) context);
 
-       }
+        }
     }
-
 
     @Nonnull
     public static Interceptor getResponseInterceptor() {

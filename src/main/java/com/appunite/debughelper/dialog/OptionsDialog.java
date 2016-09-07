@@ -20,14 +20,11 @@ public class OptionsDialog extends DialogFragment {
     private static SelectOption selectOption;
 
     public OptionsDialog() {
-
-
     }
 
     public interface OnSelectOptionListener {
 
         void onSelectOption(SelectOption option);
-
     }
 
     public static OptionsDialog newInstance(SelectOption option) {
@@ -47,7 +44,6 @@ public class OptionsDialog extends DialogFragment {
                 return input.toString();
             }
         }), String.class);
-
 
         return new AlertDialog.Builder(getActivity(), android.R.style.Theme_DeviceDefault_Dialog)
                 .setSingleChoiceItems(strings, selectOption.getCurrentPosition(), new DialogInterface.OnClickListener() {

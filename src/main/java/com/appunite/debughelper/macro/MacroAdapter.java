@@ -13,10 +13,10 @@ import java.util.List;
 
 public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder> {
 
-    private List<MacroItem> mData;
+    private List<MacroItem<GenericSavedField>> mData;
     private MacroListener listener;
 
-    public MacroAdapter(MacroListener listener, List<MacroItem> macroItems) {
+    public MacroAdapter(MacroListener listener, List<MacroItem<GenericSavedField>> macroItems) {
         this.listener = listener;
         mData = macroItems;
     }
@@ -59,7 +59,7 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
         return mData.size();
     }
 
-    public void update(List<MacroItem> macroItems) {
+    public void update(List<MacroItem<GenericSavedField>> macroItems) {
         mData = macroItems;
         notifyDataSetChanged();
     }
