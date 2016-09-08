@@ -28,6 +28,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 public class MacroFragment extends DialogFragment
         implements MacroAdapter.MacroListener, EditDialog.OnChangeNameListener {
 
@@ -46,18 +48,18 @@ public class MacroFragment extends DialogFragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
 
-        View v = new TextView(this.getActivity());
+        final View v = new TextView(this.getActivity());
         v.getClass();
 
-        View rootView = inflater.inflate(R.layout.macro_layout, container, true);
+        final View rootView = inflater.inflate(R.layout.macro_layout, container, true);
         mContext = getActivity();
         viewGroup = (ViewGroup) getActivity().findViewById(R.id.main_frame);
         debugHelperPreferences = new DebugHelperPreferences(mContext);
@@ -107,30 +109,30 @@ public class MacroFragment extends DialogFragment
 //                toast.show();
 //            }
         } else if (view instanceof Spinner) {
-            Spinner spinner = (Spinner) view;
+            final Spinner spinner = (Spinner) view;
             completeFieldList.add(new SavedField(spinner.getId(), spinner.getSelectedItemPosition()));
         } else if (view instanceof SearchView) {
-            SearchView searchView = (SearchView) view;
+            final SearchView searchView = (SearchView) view;
             completeFieldList.add(new SavedField(searchView.getId(), searchView.getQuery().toString()));
         } else if (view instanceof ViewGroup) {
-            ViewGroup parentView = (ViewGroup) view;
+            final ViewGroup parentView = (ViewGroup) view;
             final int childCount = parentView.getChildCount();
 
             for (int i = 0; i < childCount; i++) {
                 completeFieldList.addAll(mergeFields(parentView.getChildAt(i)));
             }
         } else if (view instanceof EditText) {
-            EditText editText = (EditText) view;
+            final EditText editText = (EditText) view;
             completeFieldList.add(new SavedField(editText.getId(), editText.getText().toString()));
         } else if (view instanceof CompoundButton) {
-            CompoundButton button = (CompoundButton) view;
+            final CompoundButton button = (CompoundButton) view;
             completeFieldList.add(new SavedField(button.getId(), button.isChecked()));
         }
         return completeFieldList;
     }
 
     public void doMacro(int position) {
-        MacroItem<GenericSavedField> macroItem = getMacroItems().get(position);
+        final MacroItem<GenericSavedField> macroItem = getMacroItems().get(position);
         final List<GenericSavedField> baseFieldItems = macroItem.getBaseFieldItems();
 
         for (GenericSavedField baseField : baseFieldItems) {
@@ -161,8 +163,8 @@ public class MacroFragment extends DialogFragment
         }
     }
 
-    public void saveMacros(List<MacroItem<GenericSavedField>> macroItems) {
-        Gson macroGson = createGson();
+    public void saveMacros(final List<MacroItem<GenericSavedField>> macroItems) {
+        final Gson macroGson = createGson();
         final Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {}.getType();
         final String serializedMacros = macroGson.toJson(macroItems, collectionType);
         debugHelperPreferences.saveMacroList(serializedMacros);
@@ -176,7 +178,7 @@ public class MacroFragment extends DialogFragment
     }
 
     public List<MacroItem<GenericSavedField>> getMacroItems() {
-        Gson gson = createGson();
+        final Gson gson = createGson();
 
         final String macroList = debugHelperPreferences.getMacroList();
         Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {
@@ -186,26 +188,26 @@ public class MacroFragment extends DialogFragment
     }
 
     @Override
-    public void useMacro(int position) {
+    public void useMacro(final int position) {
         doMacro(position);
     }
 
     @Override
-    public void editMacro(int position, String name) {
-        EditDialog editDialog = EditDialog.newInstance(position, name);
+    public void editMacro(final int position, final String name) {
+        final EditDialog editDialog = EditDialog.newInstance(position, name);
         editDialog.setTargetFragment(this, 0);
         editDialog.show(this.getFragmentManager(), "EditMacro");
     }
 
     @Override
-    public void deleteMacro(int position) {
+    public void deleteMacro(final int position) {
         macroItems.remove(position);
         saveMacros(macroItems);
         adapter.update(macroItems);
     }
 
     @Override
-    public void onChangeName(int position, String newName) {
+    public void onChangeName(final int position,@Nonnull final String newName) {
         macroItems.get(position).setMacroName(newName);
         saveMacros(macroItems);
         adapter.update(macroItems);

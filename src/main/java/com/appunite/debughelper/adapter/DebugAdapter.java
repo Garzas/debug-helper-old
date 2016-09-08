@@ -57,14 +57,14 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         ToggleButton mockButton;
 
-        public MainOptionHolder(View itemView) {
+        public MainOptionHolder(@Nonnull final View itemView) {
             super(itemView);
 
             mockButton = (ToggleButton) itemView.findViewById(R.id.mock_toggle);
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
             final DebugPresenter.MainItem mainItem = (DebugPresenter.MainItem) item;
 
             mockButton.setChecked(getDebugPreferences().getMockState());
@@ -90,7 +90,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         }
 
-        public static MainOptionHolder create(ViewGroup parent) {
+        public static MainOptionHolder create(@Nonnull final ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new MainOptionHolder(inflater.inflate(R.layout.debug_main_item, parent, false));
         }
@@ -100,24 +100,23 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         TextView title;
 
-        public CategoryHolder(View itemView) {
+        public CategoryHolder(@Nonnull final View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.debug_category_title);
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
-            DebugPresenter.CategoryItem categoryItem = (DebugPresenter.CategoryItem) item;
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
+            final DebugPresenter.CategoryItem categoryItem = (DebugPresenter.CategoryItem) item;
             title.setText(categoryItem.getTitle());
 
         }
 
         @Override
         public void recycle() {
-
         }
 
-        public static CategoryHolder create(ViewGroup parent) {
+        public static CategoryHolder create(@Nonnull final ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new CategoryHolder(inflater.inflate(R.layout.debug_category_item, parent, false));
         }
@@ -129,15 +128,15 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         TextView name;
         TextView value;
 
-        public InformationHolder(View itemView) {
+        public InformationHolder(@Nonnull final View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.debug_info_name);
             value = (TextView) itemView.findViewById(R.id.debug_info_value);
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
-            DebugPresenter.InformationItem informationItem = (DebugPresenter.InformationItem) item;
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
+            final DebugPresenter.InformationItem informationItem = (DebugPresenter.InformationItem) item;
 
             name.setText(informationItem.getName());
             value.setText(informationItem.getValue());
@@ -148,7 +147,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         public void recycle() {
         }
 
-        public static InformationHolder create(ViewGroup parent) {
+        public static InformationHolder create(@Nonnull final ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new InformationHolder(inflater.inflate(R.layout.debug_info_item, parent, false));
         }
@@ -174,7 +173,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
             recycle();
             final DebugPresenter.OptionItem optionItem = (DebugPresenter.OptionItem) item;
 
@@ -196,7 +195,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             }
         }
 
-        public static OptionHolder create(ViewGroup parent) {
+        public static OptionHolder create(@Nonnull final ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new OptionHolder(inflater.inflate(R.layout.debug_option_item, parent, false));
         }
@@ -213,7 +212,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         TextView title;
         View mockDisabled;
 
-        public SwitchHolder(View itemView, DebugHelperPreferences debugPreferences) {
+        public SwitchHolder(@Nonnull final View itemView, @Nonnull final DebugHelperPreferences debugPreferences) {
             super(itemView);
             this.view = itemView;
             this.debugPreferences = debugPreferences;
@@ -223,7 +222,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
             recycle();
             final DebugPresenter.SwitchItem switchItem = (DebugPresenter.SwitchItem) item;
 
@@ -255,7 +254,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             }
         }
 
-        public static SwitchHolder create(ViewGroup parent, DebugHelperPreferences debugPreferences) {
+        public static SwitchHolder create(@Nonnull final ViewGroup parent, @Nonnull final DebugHelperPreferences debugPreferences) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new SwitchHolder(inflater.inflate(R.layout.debug_switch_item, parent, false), debugPreferences);
         }
@@ -269,14 +268,14 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
         TextView actionName;
 
-        public ActionHolder(View itemView) {
+        public ActionHolder(@Nonnull final View itemView) {
             super(itemView);
             this.view = itemView;
             actionName = (TextView) itemView.findViewById(R.id.debug_action_name);
         }
 
         @Override
-        public void bind(@Nonnull DebugPresenter.BaseDebugItem item) {
+        public void bind(@Nonnull final DebugPresenter.BaseDebugItem item) {
             recycle();
             DebugPresenter.ActionItem actionItem = (DebugPresenter.ActionItem) item;
 
@@ -297,7 +296,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             }
         }
 
-        public static ActionHolder create(ViewGroup parent) {
+        public static ActionHolder create(@Nonnull final ViewGroup parent) {
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             return new ActionHolder(inflater.inflate(R.layout.debug_action_item, parent, false));
         }
@@ -307,21 +306,22 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     @Nonnull
     private List<DebugPresenter.BaseDebugItem> baseDebugItems = ImmutableList.of();
 
+    @Nonnull
     private DebugHelperPreferences debugPreferences;
 
 
-    public DebugAdapter(DebugHelperPreferences debugPreferences) {
+    public DebugAdapter(@Nonnull final DebugHelperPreferences debugPreferences) {
         this.debugPreferences = debugPreferences;
     }
 
 
     @Override
-    public void call(List<DebugPresenter.BaseDebugItem> baseDebugItems) {
+    public void call(@Nonnull final List<DebugPresenter.BaseDebugItem> baseDebugItems) {
         this.baseDebugItems = baseDebugItems;
     }
 
     @Override
-    public BaseDebugHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseDebugHolder onCreateViewHolder(@Nonnull final ViewGroup parent, final int viewType) {
         if (viewType == TYPE_CATEGORY) {
             return CategoryHolder.create(parent);
         } else if (viewType == TYPE_INFORMATION) {
@@ -342,13 +342,13 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
 
 
     @Override
-    public void onBindViewHolder(BaseDebugHolder holder, int position) {
+    public void onBindViewHolder(@Nonnull final BaseDebugHolder holder, final int position) {
         holder.bind(baseDebugItems.get(position));
     }
 
 
     @Override
-    public int getItemViewType(int position) {
+    public int getItemViewType(final int position) {
         final DebugPresenter.BaseDebugItem item = baseDebugItems.get(position);
         if (item instanceof DebugPresenter.CategoryItem) {
             return TYPE_CATEGORY;
@@ -373,7 +373,7 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
     }
 
     @Override
-    public void onViewRecycled(BaseDebugHolder holder) {
+    public void onViewRecycled(@Nonnull final BaseDebugHolder holder) {
         holder.recycle();
         super.onViewRecycled(holder);
     }

@@ -1,15 +1,13 @@
 package com.appunite.debughelper.base;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.appunite.debughelper.DebugHelper;
-import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.dialog.OptionsDialog;
-import com.appunite.debughelper.utils.DebugPermissions;
+import com.appunite.debughelper.model.SelectOption;
 
 import javax.annotation.Nonnull;
 
@@ -19,44 +17,21 @@ public abstract class DebugActivity extends AppCompatActivity implements Options
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DebugHelper.setActivity(this);
-
     }
 
     @Override
-    public void setContentView(int layoutResID) {
+    public void setContentView(final int layoutResID) {
         super.setContentView(DebugHelper.setContentView(layoutResID));
     }
 
     @Override
-    public void setContentView(View view) {
+    public void setContentView(@Nonnull final View view) {
         super.setContentView(DebugHelper.setContentView(view));
     }
 
     @Override
-    public void setContentView(View view, ViewGroup.LayoutParams params) {
+    public void setContentView(@Nonnull final View view, @Nonnull final ViewGroup.LayoutParams params) {
         super.setContentView(DebugHelper.setContentView(view), params);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(final int requestCode,
-                                           @Nonnull final String permissions[], @Nonnull final int[] grantResults) {
-        switch (requestCode) {
-            case DebugPermissions.SCREEN_ABOVE_OTHERS: {
-
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
     }
 
     @Override
@@ -72,7 +47,7 @@ public abstract class DebugActivity extends AppCompatActivity implements Options
     }
 
     @Override
-    public void onSelectOption(SelectOption option) {
+    public void onSelectOption(@Nonnull final SelectOption option) {
         DebugHelper.updateOption(option);
     }
 }

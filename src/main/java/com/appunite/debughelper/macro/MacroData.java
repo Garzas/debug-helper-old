@@ -11,7 +11,7 @@ public class MacroData<T> {
     private final List<T> adapterList;
     private final TypeToken<List<T>> adapterType;
 
-    public MacroData(List<T> adapterList, TypeToken<List<T>> adapterType) {
+    public MacroData(final List<T> adapterList, final TypeToken<List<T>> adapterType) {
         this.adapterList = adapterList;
         this.adapterType = adapterType;
     }

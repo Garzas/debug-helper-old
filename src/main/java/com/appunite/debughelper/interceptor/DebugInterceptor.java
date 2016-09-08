@@ -2,6 +2,7 @@ package com.appunite.debughelper.interceptor;
 
 import android.util.Log;
 
+import com.appunite.debughelper.BuildConfig;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 
@@ -22,13 +23,13 @@ public class DebugInterceptor {
     private static int responseCode = 200;
     private static boolean emptyResponse = false;
 
-    public static Response fakeResponse(Interceptor.Chain chain) throws IOException {
-        Response.Builder newResponse;
-        Gson gson = new Gson();
-        List<Object> arrayList = ImmutableList.of(new Object());
-        String emptyJson;
-        Request request = chain.request();
-        Response response = chain.proceed(request);
+    public static Response fakeResponse(final Interceptor.Chain chain) throws IOException {
+        final Response.Builder newResponse;
+        final Gson gson = new Gson();
+        final List<Object> arrayList = ImmutableList.of(new Object());
+        final String emptyJson;
+        final Request request = chain.request();
+        final Response response = chain.proceed(request);
 
         final String key = request.url().toString();
         if (requestCounter.containsKey(key)) {
@@ -41,13 +42,13 @@ public class DebugInterceptor {
             return response;
         }
 
-        long t1 = System.nanoTime();
+        final long t1 = System.nanoTime();
         Log.d("DebugHelper", String.format("Sending request %s on %s%n%s",
                 request.url(), chain.connection(), request.headers()));
 
         String bodyString = response.body().string();
 
-        long t2 = System.nanoTime();
+        final long t2 = System.nanoTime();
         Log.d("DebugHelper", String.format("Received response for %s in %.1fms%n%s",
                 response.request().url(), (t2 - t1) / 1e6d, response.headers()));
 
@@ -67,11 +68,11 @@ public class DebugInterceptor {
         return newResponse.code(responseCode).message("MOCK").build();
     }
 
-    public static void setResponseCode(int responseCode) {
+    public static void setResponseCode(final int responseCode) {
         DebugInterceptor.responseCode = responseCode;
     }
 
-    public static void setEmptyResponse(boolean emptyResponse) {
+    public static void setEmptyResponse(final boolean emptyResponse) {
         DebugInterceptor.emptyResponse = emptyResponse;
     }
 

@@ -13,16 +13,17 @@ import javax.annotation.Nonnull;
 public class EditDialog extends DialogFragment {
 
     private static int currentItem;
+    @Nonnull
     private static String currentName;
 
     public EditDialog() {
     }
 
     public interface OnChangeNameListener {
-        void onChangeName(int position, String newName);
+        void onChangeName(final int position, @Nonnull final String newName);
     }
 
-    public static EditDialog newInstance(int position, String name) {
+    public static EditDialog newInstance(final int position, @Nonnull final String name) {
         currentItem = position;
         currentName = name;
         return new EditDialog();
@@ -30,7 +31,7 @@ public class EditDialog extends DialogFragment {
 
     @Nonnull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final EditText editText = new EditText(getActivity());
         editText.setText(currentName);
         editText.setTextColor(Color.WHITE);

@@ -11,24 +11,26 @@ import com.appunite.debughelper.R;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder> {
 
     private List<MacroItem<GenericSavedField>> mData;
     private MacroListener listener;
 
-    public MacroAdapter(MacroListener listener, List<MacroItem<GenericSavedField>> macroItems) {
+    public MacroAdapter(@Nonnull final MacroListener listener, @Nonnull final List<MacroItem<GenericSavedField>> macroItems) {
         this.listener = listener;
         mData = macroItems;
     }
 
     @Override
-    public MacroHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.macro_item, parent, false);
+    public MacroHolder onCreateViewHolder(@Nonnull final ViewGroup parent, final int viewType) {
+        final View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.macro_item, parent, false);
         return new MacroHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final MacroHolder holder, int position) {
+    public void onBindViewHolder(final MacroHolder holder, final int position) {
         holder.macroName.setText(mData.get(position).getMacroName());
         holder.useMacro.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +61,7 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
         return mData.size();
     }
 
-    public void update(List<MacroItem<GenericSavedField>> macroItems) {
+    public void update(@Nonnull final List<MacroItem<GenericSavedField>> macroItems) {
         mData = macroItems;
         notifyDataSetChanged();
     }
@@ -70,7 +72,7 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
         ImageButton editMacro;
         ImageButton deleteMacro;
 
-        public MacroHolder(View itemView) {
+        public MacroHolder(@Nonnull final View itemView) {
             super(itemView);
             macroName = (TextView) itemView.findViewById(R.id.macro_name);
             useMacro = (ImageButton) itemView.findViewById(R.id.use_macro);
@@ -80,9 +82,9 @@ public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
     }
 
     public interface MacroListener {
-        void useMacro(int position);
-        void editMacro(int position, String name);
-        void deleteMacro(int position);
+        void useMacro(final int position);
+        void editMacro(final int position, String name);
+        void deleteMacro(final int position);
     }
 
 }
