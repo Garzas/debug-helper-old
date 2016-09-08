@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
 
 public class DebugTools {
 
-    public static String checkSDKName(int sdkInt) {
+    public static String checkSDKName(final int sdkInt) {
         switch (sdkInt) {
             case Build.VERSION_CODES.BASE: // API level 1
                 return "Base";
@@ -58,12 +59,14 @@ public class DebugTools {
                 return "Lollipop MR1";
             case 23:
                 return "Marshmallow";
+            case 24 :
+                return "Nougat";
             default:
                 return "Unknown";
         }
     }
 
-    public static int selectHttpCodePosition(int code) {
+    public static int selectHttpCodePosition(final int code) {
         switch (code) {
             /**
              * Numeric status code, 200: OK
@@ -245,7 +248,7 @@ public class DebugTools {
         }
     }
 
-    public static String getBuildVersion(Context context) {
+    public static String getBuildVersion(@Nonnull final Context context) {
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
@@ -254,8 +257,8 @@ public class DebugTools {
         }
     }
 
-    public static String getBuildType(Context context) {
-        boolean isDebuggable = (0 != (context.getApplicationInfo().flags & context.getApplicationInfo().FLAG_DEBUGGABLE));
+    public static String getBuildType(@Nonnull final Context context) {
+        final boolean isDebuggable = (0 != (context.getApplicationInfo().flags & context.getApplicationInfo().FLAG_DEBUGGABLE));
         if (isDebuggable) {
             return "debug";
         } else {
@@ -264,11 +267,11 @@ public class DebugTools {
         }
     }
 
-    public static Boolean isDebuggable(Context context) {
+    public static Boolean isDebuggable(@Nonnull final Context context) {
         return (0 != (context.getApplicationInfo().flags & context.getApplicationInfo().FLAG_DEBUGGABLE));
     }
 
-    public static String getApplicationName(Context context) {
+    public static String getApplicationName(@Nonnull final Context context) {
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
     }

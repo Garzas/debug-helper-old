@@ -63,8 +63,8 @@
         android:id="@+id/clear_counter_button"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-         android:background="@color/debug_background"
+        android:background="@color/debug_background"
         android:textColor="@android:color/white"
-        android:text="CLEAR COUNTER"/>
+        android:text="@string/clear_counter"/>
 
 </LinearLayout>

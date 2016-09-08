@@ -5,11 +5,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appunite.debughelper.DebugHelper;
-import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.dialog.OptionsDialog;
+import com.appunite.debughelper.model.SelectOption;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
-
+import javax.annotation.Nonnull;
 
 public abstract class RxDebugActivity extends RxAppCompatActivity implements OptionsDialog.OnSelectOptionListener {
 
@@ -47,7 +47,7 @@ public abstract class RxDebugActivity extends RxAppCompatActivity implements Opt
     }
 
     @Override
-    public void onSelectOption(SelectOption option) {
+    public void onSelectOption(@Nonnull final SelectOption option) {
         DebugHelper.updateOption(option);
     }
 }

@@ -12,10 +12,14 @@ import com.appunite.debughelper.R;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> {
+
+    @Nonnull
     private final ArrayList<Map.Entry<String,Integer>> mData;
 
-    public CountAdapter(Map<String, Integer> map) {
+    public CountAdapter(@Nonnull final Map<String, Integer> map) {
         mData = new ArrayList();
         mData.addAll(map.entrySet());
     }
@@ -27,8 +31,8 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Map.Entry<String, Integer> item = mData.get(position);
+    public void onBindViewHolder(@Nonnull final ViewHolder holder, final int position) {
+        final Map.Entry<String, Integer> item = mData.get(position);
 
         holder.request.setText(item.getKey());
         holder.count.setText(String.format("%s", item.getValue()));
@@ -36,7 +40,7 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
 
     }
 
-    public void updateData(Map<String, Integer> map) {
+    public void updateData(@Nonnull final Map<String, Integer> map) {
         mData.clear();
         mData.addAll(map.entrySet());
         notifyDataSetChanged();
@@ -52,7 +56,7 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
         public TextView request;
         public TextView count;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(@Nonnull final View itemView) {
             super(itemView);
             request = (TextView) itemView.findViewById(R.id.count_name);
             count = (TextView) itemView.findViewById(R.id.count_value);

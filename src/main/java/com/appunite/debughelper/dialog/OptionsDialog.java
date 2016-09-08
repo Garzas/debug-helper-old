@@ -17,17 +17,15 @@ import javax.annotation.Nullable;
 public class OptionsDialog extends DialogFragment {
 
     private static int currentItem;
+    @Nonnull
     private static SelectOption selectOption;
 
     public OptionsDialog() {
-
-
     }
 
     public interface OnSelectOptionListener {
 
-        void onSelectOption(SelectOption option);
-
+        void onSelectOption(@Nonnull final SelectOption option);
     }
 
     public static OptionsDialog newInstance(SelectOption option) {
@@ -38,7 +36,7 @@ public class OptionsDialog extends DialogFragment {
 
     @Nonnull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
 
         final String[] strings = Iterables.toArray(Iterables.transform(selectOption.getValues(), new Function<Integer, String>() {
             @Nullable
@@ -47,7 +45,6 @@ public class OptionsDialog extends DialogFragment {
                 return input.toString();
             }
         }), String.class);
-
 
         return new AlertDialog.Builder(getActivity(), android.R.style.Theme_DeviceDefault_Dialog)
                 .setSingleChoiceItems(strings, selectOption.getCurrentPosition(), new DialogInterface.OnClickListener() {
