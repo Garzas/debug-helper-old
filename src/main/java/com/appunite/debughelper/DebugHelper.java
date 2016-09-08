@@ -251,7 +251,6 @@ public class DebugHelper {
         appContext = context;
         if (DebugTools.isDebuggable(context)) {
             LeakCanary.install((Application) context);
-
         }
     }
 

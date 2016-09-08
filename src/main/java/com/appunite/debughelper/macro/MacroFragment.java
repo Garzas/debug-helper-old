@@ -15,21 +15,13 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.debughelper.DebugHelperPreferences;
 import com.appunite.debughelper.R;
 import com.appunite.debughelper.dialog.EditDialog;
-import com.appunite.debughelper.listener.MacroRecyclerViewListener;
+import com.appunite.debughelper.utils.MacroSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -44,7 +36,6 @@ public class MacroFragment extends DialogFragment
     private List<MacroItem<GenericSavedField>> macroItems;
     private ViewGroup viewGroup;
     private MacroAdapter adapter = new MacroAdapter(this, macroItems);
-    MacroRecyclerViewListener recyclerViewDataHolder;
 
     RecyclerView recyclerView;
     Button createMacroButton;
@@ -94,26 +85,30 @@ public class MacroFragment extends DialogFragment
         return rootView;
     }
 
-    public List<Object> mergeFields(View view) {
-        final List<Object> completeFieldList = new ArrayList<>();
+    public List<SavedField> mergeFields(View view) {
+        final List<SavedField> completeFieldList = new ArrayList<>();
 
         if (view instanceof RecyclerView) {
-            final RecyclerView recycleItem = (RecyclerView) view;
-            if (recycleItem.getAdapter() instanceof MacroRecyclerViewListener) {
-                recyclerViewDataHolder = (MacroRecyclerViewListener) recycleItem.getAdapter();
-                final List<GenericSavedField> recyclerViewItems = recyclerViewDataHolder.macroData();
-                if (recyclerViewItems.size() <= 15) {
-                    completeFieldList.add(new RecycleViewItem<>(recyclerViewItems));
-                }
-            } else {
-                Toast toast = Toast.makeText(getActivity(), "If you want save "
-                        + recyclerView.getAdapter().getClass().getSimpleName()
-                        + " data, implement "
-                        + MacroRecyclerViewListener.class.getSimpleName(), Toast.LENGTH_SHORT);
-                toast.show();
-            }
+//            final RecyclerView recycleItem = (RecyclerView) view;
+//            if (recycleItem.getAdapter() instanceof MacroRecyclerViewListener) {
+//                final MacroRecyclerViewListener recyclerViewDataHolder = (MacroRecyclerViewListener) recycleItem.getAdapter();
+//
+//                final MacroData macroData = recyclerViewDataHolder.macroData();
+//                //TODO more items is lagging
+//                if (macroData.getAdapterList().size() <= 15) {
+//                    final String json = adapterGson().toJson(macroData.getAdapterList());
+//                    completeFieldList.add(new SavedField(recycleItem.getId(), json, macroData.getAdapterType()));
+//                }
+//            } else {
+//                Toast toast = Toast.makeText(getActivity(), "If you want save "
+//                        + recycleItem.getAdapter().getClass().getSimpleName()
+//                        + " data, implement "
+//                        + MacroRecyclerViewListener.class.getSimpleName(), Toast.LENGTH_LONG);
+//                toast.show();
+//            }
         } else if (view instanceof Spinner) {
-            completeFieldList.add(createSpinnerMacro(view));
+            Spinner spinner = (Spinner) view;
+            completeFieldList.add(new SavedField(spinner.getId(), spinner.getSelectedItemPosition()));
         } else if (view instanceof SearchView) {
             SearchView searchView = (SearchView) view;
             completeFieldList.add(new SavedField(searchView.getId(), searchView.getQuery().toString()));
@@ -132,13 +127,6 @@ public class MacroFragment extends DialogFragment
             completeFieldList.add(new SavedField(button.getId(), button.isChecked()));
         }
         return completeFieldList;
-    }
-
-    public List<SavedField> createSpinnerMacro(View view) {
-        List<SavedField> newList = new ArrayList<>();
-        Spinner spinner = (Spinner) view;
-        newList.add(new SavedField(spinner.getId(), spinner.getSelectedItemPosition()));
-        return newList;
     }
 
     public void doMacro(int position) {
@@ -161,53 +149,29 @@ public class MacroFragment extends DialogFragment
                 } else if (view instanceof SearchView) {
                     SearchView searchView = (SearchView) view;
                     searchView.setQuery(savedField.getText(), false);
+//                } else if (view instanceof RecyclerView) {
+//                    RecyclerView recyclerView = (RecyclerView) view;
+//                    MacroRecyclerViewListener listener = (MacroRecyclerViewListener) recyclerView.getAdapter();
+//
+//                    listener.fillFields((List) adapterGson().fromJson(savedField.getJson(), savedField.getTypeToken()));
                 } else {
                     //TODO list all not updated items
                 }
-            } else if (baseField instanceof RecycleViewItem) {
-                RecycleViewItem recycleViewItem = (RecycleViewItem) baseField;
-                recyclerViewDataHolder.fillFields(recycleViewItem.getRecyclerViewItems());
             }
         }
-
     }
 
     public void saveMacros(List<MacroItem<GenericSavedField>> macroItems) {
         Gson macroGson = createGson();
         final Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {}.getType();
-        String serializedMacros = macroGson.toJson(macroItems, collectionType);
+        final String serializedMacros = macroGson.toJson(macroItems, collectionType);
         debugHelperPreferences.saveMacroList(serializedMacros);
 
     }
 
-    private static class DebugSerializer implements JsonDeserializer<GenericSavedField>, JsonSerializer<GenericSavedField> {
-
-        @Override
-        public GenericSavedField deserialize(final JsonElement json,
-                                             final Type typeOfT,
-                                             final JsonDeserializationContext context) throws JsonParseException {
-            try {
-                final String type = json.getAsJsonObject().get("type").getAsString();
-                final Class<?> clazz = Class.forName(type);
-                return context.deserialize(json, clazz);
-            } catch (ClassNotFoundException e) {
-                throw new JsonParseException(e);
-            }
-        }
-
-        @Override
-        public JsonElement serialize(final GenericSavedField src,
-                                     final Type typeOfSrc,
-                                     final JsonSerializationContext context) {
-            final JsonObject serialized = (JsonObject) context.serialize(src);
-            serialized.addProperty("type", src.getClass().getName());
-            return serialized;
-        }
-    }
-
     private static Gson createGson() {
         return new GsonBuilder()
-                .registerTypeAdapter(GenericSavedField.class, new DebugSerializer())
+                .registerTypeAdapter(GenericSavedField.class, new MacroSerializer())
                 .create();
     }
 
@@ -249,7 +213,6 @@ public class MacroFragment extends DialogFragment
 
 }
 
-
 //TODO GET MACRO ITEMS FILTER
 
 //    public List<Object> getMacroItems() {
@@ -278,7 +241,6 @@ public class MacroFragment extends DialogFragment
 //
 //        }
 //    }
-
 
 //    public void saveMacros(List<MacroItem> macroItems) {
 //        StringBuilder allData = new StringBuilder();
@@ -330,6 +292,4 @@ public class MacroFragment extends DialogFragment
 //                    }
 //                }
 //            }
-
-//TODO show views not found or implement overriding method
 //        }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
 
-import com.appunite.debughelper.testpack.AClass;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
