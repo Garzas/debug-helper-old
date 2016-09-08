@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 public class EditDialog extends DialogFragment {
 
     private static int currentItem;
-    @Nonnull
     private static String currentName;
 
     public EditDialog() {

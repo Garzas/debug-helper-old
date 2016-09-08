@@ -49,6 +49,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="singleChoice"
+        android:minHeight="64dp"
         android:divider="@null"
         android:scrollingCache="false" />
 

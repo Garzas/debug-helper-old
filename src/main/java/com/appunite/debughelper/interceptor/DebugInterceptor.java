@@ -2,7 +2,7 @@ package com.appunite.debughelper.interceptor;
 
 import android.util.Log;
 
-import com.appunite.debughelper.BuildConfig;
+import com.appunite.debughelper.DebugHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 
@@ -24,6 +24,7 @@ public class DebugInterceptor {
     private static boolean emptyResponse = false;
 
     public static Response fakeResponse(final Interceptor.Chain chain) throws IOException {
+        DebugHelper.interceptorEnabled();
         final Response.Builder newResponse;
         final Gson gson = new Gson();
         final List<Object> arrayList = ImmutableList.of(new Object());

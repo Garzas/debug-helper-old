@@ -8,11 +8,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.appunite.debughelper.adapter.DebugAdapter;
 import com.appunite.debughelper.dialog.OptionsDialog;
@@ -29,10 +32,13 @@ import com.github.pedrovgs.lynx.LynxConfig;
 import com.jakewharton.scalpel.ScalpelFrameLayout;
 import com.squareup.leakcanary.LeakCanary;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subscriptions.SerialSubscription;
@@ -42,10 +48,7 @@ public class DebugHelper {
 
     private static Context appContext;
     private static Boolean fpsVisibility = false;
-
-    public Boolean isWorking() {
-        return true;
-    }
+    private static boolean isInterceptorInstalled = false;
 
     private static Activity currentActivity;
     private static SerialSubscription subscription = new SerialSubscription();
@@ -56,6 +59,7 @@ public class DebugHelper {
     private static DisplayMetrics metrics;
     private static ViewGroup mainFrame;
     private static RecyclerView debugRecyclerView;
+    private static DrawerLayout drawerLayout;
 
     public static void setActivity(Activity activity) {
         currentActivity = activity;
@@ -72,8 +76,10 @@ public class DebugHelper {
 
     @Nonnull
     public static View setContentView(@Nonnull View child) {
-        final View root = currentActivity.getLayoutInflater().inflate(R.layout.debug_layout, null);
+        final View root;
+        root = currentActivity.getLayoutInflater().inflate(R.layout.debug_layout, null);
 
+        drawerLayout = (DrawerLayout) root;
         mainFrame = (ViewGroup) root.findViewById(R.id.main_frame);
         mainFrame.removeAllViews();
         mainFrame.addView(child);
@@ -142,6 +148,7 @@ public class DebugHelper {
                         }),
 
                 debugPresenter.getFpsLabelObservable()
+                        .filter(isInstalled())
                         .filter(new Func1<Boolean, Boolean>() {
                             @Override
                             public Boolean call(final Boolean aBoolean) {
@@ -159,6 +166,7 @@ public class DebugHelper {
                         }),
 
                 debugPresenter.getFpsLabelObservable()
+                        .filter(isInstalled())
                         .filter(canDrawOverlays())
                         .subscribe(new Action1<Boolean>() {
                             @Override
@@ -166,7 +174,6 @@ public class DebugHelper {
                                 if (isSet) {
                                     TinyDancer.create().show(appContext);
                                 } else {
-                                    //TODO fix nullpointer when permission not granted
                                     TinyDancer.hide(appContext);
                                 }
                                 fpsVisibility = isSet;
@@ -190,6 +197,16 @@ public class DebugHelper {
                             public void call(Boolean aBoolean) {
                                 DebugInterceptor.setEmptyResponse(aBoolean);
                                 activity.recreate();
+                            }
+                        }),
+
+                debugPresenter.interceptorNotImplementedObservable()
+                        .delay(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                        .filter(isInterceptorNotImplemented())
+                        .subscribe(new Action1<Object>() {
+                            @Override
+                            public void call(final Object o) {
+                                Toast.makeText(currentActivity, R.string.interceptor_not_implemented, Toast.LENGTH_LONG).show();
                             }
                         }),
 
@@ -234,6 +251,29 @@ public class DebugHelper {
         ));
     }
 
+    private static Func1<Object, Boolean> isInterceptorNotImplemented() {
+        return new Func1<Object, Boolean>() {
+            @Override
+            public Boolean call(final Object o) {
+                return !isInterceptorInstalled;
+            }
+        };
+    }
+
+    private static Func1<Boolean, Boolean> isInstalled() {
+        return new Func1<Boolean, Boolean>() {
+            @Override
+            public Boolean call(final Boolean aBoolean) {
+                if (appContext == null) {
+                    Toast.makeText(currentActivity, R.string.not_implemented_install, Toast.LENGTH_LONG).show();
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        };
+    }
+
     private static Func1<Boolean, Boolean> canDrawOverlays() {
         return new Func1<Boolean, Boolean>() {
             @Override
@@ -271,7 +311,16 @@ public class DebugHelper {
         switch (option.getOption()) {
             case DebugOption.SET_HTTP_CODE:
                 DebugInterceptor.setResponseCode(option.getValues().get(option.getCurrentPosition()));
+                debugPresenter.httpCodeChangedObserver().onNext(null);
         }
         debugAdapter.notifyDataSetChanged();
+    }
+
+    public static void hide() {
+        drawerLayout.closeDrawer(Gravity.RIGHT);
+    }
+
+    public static void interceptorEnabled() {
+        isInterceptorInstalled = true;
     }
 }
