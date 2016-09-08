@@ -67,9 +67,17 @@ public class DebugPresenter {
     private final Context context;
     @Nonnull
     private final PublishSubject<Object> recreateActivitySubject = PublishSubject.create();
+    @Nonnull
     private final Observable<ActivityManager.MemoryInfo> memorySubject;
+    @Nonnull
     private final Observable<Integer> showRequestObservable;
+    @Nonnull
     private final Observable<Integer> showMacroObservable;
+    @Nonnull
+    private final Observable<Object> interceptorNotImplemented;
+    @Nonnull
+    private final PublishSubject httpCodeChangedSubject = PublishSubject.create();
+
 
     public abstract static class BaseDebugItem {
     }
@@ -555,6 +563,12 @@ public class DebugPresenter {
                         }
                 );
 
+        interceptorNotImplemented = Observable.merge(
+                changeResponseObservable,
+                showRequestObservable,
+                httpCodeChangedSubject
+        );
+
     }
 
     @Nonnull
@@ -576,6 +590,11 @@ public class DebugPresenter {
     @Nonnull
     public Observer<Float> densityObserver() {
         return densitySubject;
+    }
+
+    @Nonnull
+    public Observer httpCodeChangedObserver() {
+        return httpCodeChangedSubject;
     }
 
     @Nonnull
@@ -631,5 +650,10 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Integer> getShowMacroObservable() {
         return showMacroObservable;
+    }
+
+    @Nonnull
+    public Observable<Object> interceptorNotImplementedObservable() {
+        return interceptorNotImplemented;
     }
 }

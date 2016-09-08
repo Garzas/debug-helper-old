@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.appunite.debughelper.DebugHelperPreferences;
 import com.appunite.debughelper.R;
+import com.appunite.debughelper.base.DebugActivity;
 import com.appunite.debughelper.dialog.EditDialog;
 import com.appunite.debughelper.utils.MacroSerializer;
 import com.google.gson.Gson;
@@ -33,11 +34,16 @@ import javax.annotation.Nonnull;
 public class MacroFragment extends DialogFragment
         implements MacroAdapter.MacroListener, EditDialog.OnChangeNameListener {
 
+    public interface MacroFragmentListener {
+        void onFinishDialog();
+    }
+
     private Context mContext;
     private DebugHelperPreferences debugHelperPreferences;
     private List<MacroItem<GenericSavedField>> macroItems;
     private ViewGroup viewGroup;
     private MacroAdapter adapter = new MacroAdapter(this, macroItems);
+    private MacroFragmentListener listener;
 
     RecyclerView recyclerView;
     Button createMacroButton;
@@ -58,6 +64,7 @@ public class MacroFragment extends DialogFragment
 
         final View v = new TextView(this.getActivity());
         v.getClass();
+        listener = (MacroFragmentListener) getActivity();
 
         final View rootView = inflater.inflate(R.layout.macro_layout, container, true);
         mContext = getActivity();
@@ -190,6 +197,8 @@ public class MacroFragment extends DialogFragment
     @Override
     public void useMacro(final int position) {
         doMacro(position);
+        listener.onFinishDialog();
+        dismiss();
     }
 
     @Override

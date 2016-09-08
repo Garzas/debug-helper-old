@@ -7,11 +7,12 @@ import android.view.ViewGroup;
 
 import com.appunite.debughelper.DebugHelper;
 import com.appunite.debughelper.dialog.OptionsDialog;
+import com.appunite.debughelper.macro.MacroFragment;
 import com.appunite.debughelper.model.SelectOption;
 
 import javax.annotation.Nonnull;
 
-public abstract class DebugActivity extends AppCompatActivity implements OptionsDialog.OnSelectOptionListener {
+public abstract class DebugActivity extends AppCompatActivity implements OptionsDialog.OnSelectOptionListener, MacroFragment.MacroFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,5 +50,10 @@ public abstract class DebugActivity extends AppCompatActivity implements Options
     @Override
     public void onSelectOption(@Nonnull final SelectOption option) {
         DebugHelper.updateOption(option);
+    }
+
+    @Override
+    public void onFinishDialog() {
+        DebugHelper.hide();
     }
 }
