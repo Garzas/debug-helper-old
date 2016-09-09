@@ -35,7 +35,7 @@ public class EditDialog extends DialogFragment {
         editText.setText(currentName);
         editText.setTextColor(Color.WHITE);
 
-        return new AlertDialog.Builder(getActivity(), android.R.style.Theme_DeviceDefault_Dialog)
+        return new AlertDialog.Builder(getActivity(), android.R.style.Theme_Holo_Dialog)
                 .setView(editText)
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override

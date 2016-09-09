@@ -6,18 +6,18 @@ import java.util.List;
 public class MacroItem<T extends GenericSavedField> {
 
     private List<T> baseFieldItems;
-    private final int hashCode;
+    private final String activityName;
     private String macroName;
 
 
-    public MacroItem(List<T> baseFieldItems, int activityHashCode) {
+    public MacroItem(final List<T> baseFieldItems, final String activityName) {
         this.baseFieldItems = baseFieldItems;
-        hashCode = activityHashCode;
-        macroName = "Macro";
+        this.activityName = activityName;
+        macroName = activityName + " Macro";
     }
 
-    public int getHashCode() {
-        return hashCode;
+    public String getActivityName() {
+        return activityName;
     }
 
     public String getMacroName() {
