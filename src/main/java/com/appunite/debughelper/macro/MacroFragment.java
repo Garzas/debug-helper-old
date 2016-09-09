@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,10 @@ import com.appunite.debughelper.R;
 import com.appunite.debughelper.base.DebugActivity;
 import com.appunite.debughelper.dialog.EditDialog;
 import com.appunite.debughelper.utils.MacroSerializer;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -28,13 +33,16 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class MacroFragment extends DialogFragment
         implements MacroAdapter.MacroListener, EditDialog.OnChangeNameListener {
 
     public interface MacroFragmentListener {
+
         void onFinishDialog();
     }
 
@@ -47,7 +55,6 @@ public class MacroFragment extends DialogFragment
 
     RecyclerView recyclerView;
     Button createMacroButton;
-    TextView activityName;
 
     public static Fragment newInstance() {
         return new MacroFragment();
@@ -73,19 +80,20 @@ public class MacroFragment extends DialogFragment
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView = (RecyclerView) rootView.findViewById(R.id.macro_recyclerview);
         recyclerView.setLayoutManager(mLayoutManager);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        recyclerView.setHasFixedSize(true);
+        ((LinearLayoutManager) recyclerView.getLayoutManager()).setRecycleChildrenOnDetach(true);
         createMacroButton = (Button) rootView.findViewById(R.id.create_macro_button);
-        activityName = (TextView) rootView.findViewById(R.id.macro_activity_name);
 
         macroItems = getMacroItems();
 
         adapter = new MacroAdapter(this, macroItems);
         recyclerView.setAdapter(adapter);
-        activityName.setText(getActivity().getClass().getSimpleName());
 
         createMacroButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                macroItems.add(new MacroItem(mergeFields(viewGroup.getChildAt(0)), mContext.hashCode()));
+                macroItems.add(new MacroItem(mergeFields(viewGroup.getChildAt(0)), getActivity().getClass().getSimpleName()));
                 adapter.update(macroItems);
                 saveMacros(macroItems);
             }
@@ -172,7 +180,8 @@ public class MacroFragment extends DialogFragment
 
     public void saveMacros(final List<MacroItem<GenericSavedField>> macroItems) {
         final Gson macroGson = createGson();
-        final Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {}.getType();
+        final Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {
+        }.getType();
         final String serializedMacros = macroGson.toJson(macroItems, collectionType);
         debugHelperPreferences.saveMacroList(serializedMacros);
 
@@ -187,11 +196,20 @@ public class MacroFragment extends DialogFragment
     public List<MacroItem<GenericSavedField>> getMacroItems() {
         final Gson gson = createGson();
 
-        final String macroList = debugHelperPreferences.getMacroList();
+        final String json = debugHelperPreferences.getMacroList();
         Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {
 
         }.getType();
-        return gson.fromJson(macroList, collectionType);
+        final List<MacroItem<GenericSavedField>> macroItems = gson.fromJson(json, collectionType);
+
+        return Lists.newArrayList(Iterables
+                .filter(macroItems, new Predicate<MacroItem<GenericSavedField>>() {
+                    @Override
+                    public boolean apply(@Nullable final MacroItem<GenericSavedField> input) {
+                        assert input != null;
+                        return input.getActivityName().equals(getActivity().getClass().getSimpleName());
+                    }
+                }));
     }
 
     @Override
@@ -205,7 +223,7 @@ public class MacroFragment extends DialogFragment
     public void editMacro(final int position, final String name) {
         final EditDialog editDialog = EditDialog.newInstance(position, name);
         editDialog.setTargetFragment(this, 0);
-        editDialog.show(this.getFragmentManager(), "EditMacro");
+        editDialog.show(this.getFragmentManager(), mContext.getString(R.string.edit_macro));
     }
 
     @Override
@@ -216,7 +234,7 @@ public class MacroFragment extends DialogFragment
     }
 
     @Override
-    public void onChangeName(final int position,@Nonnull final String newName) {
+    public void onChangeName(final int position, @Nonnull final String newName) {
         macroItems.get(position).setMacroName(newName);
         saveMacros(macroItems);
         adapter.update(macroItems);
