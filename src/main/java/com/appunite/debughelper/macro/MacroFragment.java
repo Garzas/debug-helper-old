@@ -15,31 +15,23 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import com.appunite.debughelper.DebugHelperPreferences;
 import com.appunite.debughelper.R;
-import com.appunite.debughelper.base.DebugActivity;
 import com.appunite.debughelper.dialog.EditDialog;
-import com.appunite.debughelper.utils.MacroSerializer;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.appunite.debughelper.model.EditMacro;
+import com.jakewharton.rxbinding.view.RxView;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.SerialSubscription;
+import rx.subscriptions.Subscriptions;
 
 public class MacroFragment extends DialogFragment
-        implements MacroAdapter.MacroListener, EditDialog.OnChangeNameListener {
+        implements EditDialog.OnChangeNameListener, MacroAdapter.MacroListener {
 
     public interface MacroFragmentListener {
 
@@ -47,14 +39,16 @@ public class MacroFragment extends DialogFragment
     }
 
     private Context mContext;
-    private DebugHelperPreferences debugHelperPreferences;
-    private List<MacroItem<GenericSavedField>> macroItems;
     private ViewGroup viewGroup;
-    private MacroAdapter adapter = new MacroAdapter(this, macroItems);
     private MacroFragmentListener listener;
+    private MacroAdapter adapter = new MacroAdapter(this);
 
     RecyclerView recyclerView;
     Button createMacroButton;
+
+    MacroPresenter presenter;
+
+    private final SerialSubscription subscriptions = new SerialSubscription();
 
     public static Fragment newInstance() {
         return new MacroFragment();
@@ -68,104 +62,66 @@ public class MacroFragment extends DialogFragment
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-
-        final View v = new TextView(this.getActivity());
-        v.getClass();
         listener = (MacroFragmentListener) getActivity();
+        presenter = new MacroPresenter(getActivity());
 
         final View rootView = inflater.inflate(R.layout.macro_layout, container, true);
         mContext = getActivity();
         viewGroup = (ViewGroup) getActivity().findViewById(R.id.main_frame);
-        debugHelperPreferences = new DebugHelperPreferences(mContext);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView = (RecyclerView) rootView.findViewById(R.id.macro_recyclerview);
         recyclerView.setLayoutManager(mLayoutManager);
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.setHasFixedSize(true);
         ((LinearLayoutManager) recyclerView.getLayoutManager()).setRecycleChildrenOnDetach(true);
         createMacroButton = (Button) rootView.findViewById(R.id.create_macro_button);
-
-        macroItems = getMacroItems();
-
-        adapter = new MacroAdapter(this, macroItems);
         recyclerView.setAdapter(adapter);
 
-        createMacroButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                macroItems.add(new MacroItem(mergeFields(viewGroup.getChildAt(0)), getActivity().getClass().getSimpleName()));
-                adapter.update(macroItems);
-                saveMacros(macroItems);
-            }
-        });
+
+        subscriptions.set(new CompositeSubscription(
+                presenter.getMacroListObservable()
+                        .mergeWith(presenter.getSaveMacrosObservable())
+                        .subscribe(adapter),
+                RxView.clicks(createMacroButton)
+                        .map(new Func1<Void, ViewGroup>() {
+                            @Override
+                            public ViewGroup call(final Void aVoid) {
+                                return viewGroup;
+                            }
+                        })
+                        .subscribe(presenter.createClickObserver()),
+                presenter.subscribe
+
+        ));
+
 
         return rootView;
     }
 
-    public List<SavedField> mergeFields(View view) {
-        final List<SavedField> completeFieldList = new ArrayList<>();
-
-        if (view instanceof RecyclerView) {
-//            final RecyclerView recycleItem = (RecyclerView) view;
-//            if (recycleItem.getAdapter() instanceof MacroRecyclerViewListener) {
-//                final MacroRecyclerViewListener recyclerViewDataHolder = (MacroRecyclerViewListener) recycleItem.getAdapter();
-//
-//                final MacroData macroData = recyclerViewDataHolder.macroData();
-//                //TODO more items is lagging
-//                if (macroData.getAdapterList().size() <= 15) {
-//                    final String json = adapterGson().toJson(macroData.getAdapterList());
-//                    completeFieldList.add(new SavedField(recycleItem.getId(), json, macroData.getAdapterType()));
-//                }
-//            } else {
-//                Toast toast = Toast.makeText(getActivity(), "If you want save "
-//                        + recycleItem.getAdapter().getClass().getSimpleName()
-//                        + " data, implement "
-//                        + MacroRecyclerViewListener.class.getSimpleName(), Toast.LENGTH_LONG);
-//                toast.show();
-//            }
-        } else if (view instanceof Spinner) {
-            final Spinner spinner = (Spinner) view;
-            completeFieldList.add(new SavedField(spinner.getId(), spinner.getSelectedItemPosition()));
-        } else if (view instanceof SearchView) {
-            final SearchView searchView = (SearchView) view;
-            completeFieldList.add(new SavedField(searchView.getId(), searchView.getQuery().toString()));
-        } else if (view instanceof ViewGroup) {
-            final ViewGroup parentView = (ViewGroup) view;
-            final int childCount = parentView.getChildCount();
-
-            for (int i = 0; i < childCount; i++) {
-                completeFieldList.addAll(mergeFields(parentView.getChildAt(i)));
-            }
-        } else if (view instanceof EditText) {
-            final EditText editText = (EditText) view;
-            completeFieldList.add(new SavedField(editText.getId(), editText.getText().toString()));
-        } else if (view instanceof CompoundButton) {
-            final CompoundButton button = (CompoundButton) view;
-            completeFieldList.add(new SavedField(button.getId(), button.isChecked()));
-        }
-        return completeFieldList;
+    @Override
+    public void onDestroyView() {
+        subscriptions.set(Subscriptions.empty());
+        super.onDestroyView();
     }
 
-    public void doMacro(int position) {
-        final MacroItem<GenericSavedField> macroItem = getMacroItems().get(position);
-        final List<GenericSavedField> baseFieldItems = macroItem.getBaseFieldItems();
+    public void doMacro(final MacroPresenter.MacroItem macroItem) {
+        final List<SavedField> baseFieldItems = macroItem.getBaseFieldItems();
 
-        for (GenericSavedField baseField : baseFieldItems) {
-            if (baseField instanceof SavedField) {
-                final SavedField savedField = (SavedField) baseField;
-                View view = viewGroup.findViewById(savedField.getIdView());
+        for (SavedField baseField : baseFieldItems) {
+            if (baseField != null) {
+                View view = viewGroup.findViewById(baseField.getIdView());
                 if (view instanceof EditText) {
                     EditText editText = (EditText) view;
-                    editText.setText(savedField.getText());
+                    editText.setText(baseField.getText());
                 } else if (view instanceof CompoundButton) {
                     CompoundButton compoundButton = (CompoundButton) view;
-                    compoundButton.setChecked(savedField.isChecked());
+                    compoundButton.setChecked(baseField.isChecked());
                 } else if (view instanceof Spinner) {
                     Spinner spinner = (Spinner) view;
-                    spinner.setSelection(savedField.getSelectedPosition());
+                    spinner.setSelection(baseField.getSelectedPosition());
                 } else if (view instanceof SearchView) {
                     SearchView searchView = (SearchView) view;
-                    searchView.setQuery(savedField.getText(), false);
+                    searchView.setQuery(baseField.getText(), false);
 //                } else if (view instanceof RecyclerView) {
 //                    RecyclerView recyclerView = (RecyclerView) view;
 //                    MacroRecyclerViewListener listener = (MacroRecyclerViewListener) recyclerView.getAdapter();
@@ -178,147 +134,28 @@ public class MacroFragment extends DialogFragment
         }
     }
 
-    public void saveMacros(final List<MacroItem<GenericSavedField>> macroItems) {
-        final Gson macroGson = createGson();
-        final Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {
-        }.getType();
-        final String serializedMacros = macroGson.toJson(macroItems, collectionType);
-        debugHelperPreferences.saveMacroList(serializedMacros);
-
-    }
-
-    private static Gson createGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(GenericSavedField.class, new MacroSerializer())
-                .create();
-    }
-
-    public List<MacroItem<GenericSavedField>> getMacroItems() {
-        final Gson gson = createGson();
-
-        final String json = debugHelperPreferences.getMacroList();
-        Type collectionType = new TypeToken<List<MacroItem<GenericSavedField>>>() {
-
-        }.getType();
-        final List<MacroItem<GenericSavedField>> macroItems = gson.fromJson(json, collectionType);
-
-        return Lists.newArrayList(Iterables
-                .filter(macroItems, new Predicate<MacroItem<GenericSavedField>>() {
-                    @Override
-                    public boolean apply(@Nullable final MacroItem<GenericSavedField> input) {
-                        assert input != null;
-                        return input.getActivityName().equals(getActivity().getClass().getSimpleName());
-                    }
-                }));
+    @Override
+    public void onChangeName(final int position, @Nonnull final String newName) {
+        presenter.changeNameObserver().onNext(new EditMacro(position, newName));
     }
 
     @Override
-    public void useMacro(final int position) {
-        doMacro(position);
+    public void useMacro(MacroPresenter.MacroItem macroItem) {
+        doMacro(macroItem);
         listener.onFinishDialog();
         dismiss();
     }
 
     @Override
-    public void editMacro(final int position, final String name) {
-        final EditDialog editDialog = EditDialog.newInstance(position, name);
-        editDialog.setTargetFragment(this, 0);
-        editDialog.show(this.getFragmentManager(), mContext.getString(R.string.edit_macro));
+    public void editMacro(final EditMacro editMacro) {
+        final EditDialog editDialog = EditDialog.newInstance(editMacro.getPosition(), editMacro.getName());
+        editDialog.setTargetFragment(MacroFragment.this, 0);
+        editDialog.show(MacroFragment.this.getFragmentManager(), mContext.getString(R.string.edit_macro));
     }
 
     @Override
     public void deleteMacro(final int position) {
-        macroItems.remove(position);
-        saveMacros(macroItems);
-        adapter.update(macroItems);
-    }
-
-    @Override
-    public void onChangeName(final int position, @Nonnull final String newName) {
-        macroItems.get(position).setMacroName(newName);
-        saveMacros(macroItems);
-        adapter.update(macroItems);
+        presenter.deleteMacroObserver().onNext(position);
     }
 
 }
-
-//TODO GET MACRO ITEMS FILTER
-
-//    public List<Object> getMacroItems() {
-//        String[] macroList = debugHelperPreferences.getMacroList().split(macroDivider);
-//
-//        for (String baseField : macroList) {
-//            String[] fieldList = baseField.split(savedFieldName);
-//            boolean switchA = false;
-//            for (String field : fieldList) {
-//                switchA = !switchA;
-//                if (switchA) {
-//                    Type collectionType = new TypeToken<List<SavedField>>() {
-//
-//                    }.getType();
-//
-//                    final Gson gson = new GsonBuilder().create();
-//                    return gson.fromJson(field, collectionType);
-//                } else {
-//                    String[] unknownField = field.split(unknownName);
-//                    for (String string : unknownField) {
-//
-//                    }
-//                }
-//
-//            }
-//
-//        }
-//    }
-
-//    public void saveMacros(List<MacroItem> macroItems) {
-//        StringBuilder allData = new StringBuilder();
-//        final Gson gson = new Gson();
-//        for (MacroItem macroItem : macroItems) {
-//            allData.append(macroDivider);
-//            StringBuilder fields = new StringBuilder();
-//            for (int i = 0; i < macroItem.getBaseFieldItems().size(); i++) {
-//                Object field = macroItem.getBaseFieldItems().get(i);
-//
-//                if (field instanceof BaseFieldItem) {
-//                    fields.append(unknownName);
-//                    StringBuilder baseField = new StringBuilder();
-//                    BaseFieldItem baseFieldItem = (BaseFieldItem) field;
-//                    String jsonField = gson.toJson(baseFieldItem.getUserAdapterItems());
-//                    baseField.append(jsonField);
-//                    baseField.append(smallDivider);
-//                    baseField.append(gson.toJson(baseFieldItem.getClasses()));
-//                    fields.append(baseField);
-//                } else {
-//                    fields.append(savedFieldName);
-//                    fields.append(gson.toJson(field));
-//                }
-//
-//            }
-//            allData.append(fields);
-//        }
-//        debugHelperPreferences.saveMacroList(allData.toString());
-//    }
-
-//    public List<MacroItem> getMacroItems() {
-//        String json = debugHelperPreferences.getMacroList();
-//        Type collectionType = new TypeToken<List<MacroItem>>() {
-//
-//        }.getType();
-//
-//        final Gson gson = new GsonBuilder().create();
-//        return gson.fromJson(json, collectionType);
-//    }
-
-//
-//        if (changedViews.isEmpty()) {
-//            List<SavedField> filteredMacros = savedFields;
-//            for (int k = 0; k < changedViews.size(); k++) {
-//                for (int j = 0; j < filteredMacros.size(); j++) {
-//                    if (changedViews.get(k).getIdView().equals(filteredMacros.get(j).getIdView())) {
-//                        filteredMacros.remove(j);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
