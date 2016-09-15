@@ -21,7 +21,9 @@ import com.appunite.debughelper.adapter.DebugAdapter;
 import com.appunite.debughelper.dialog.OptionsDialog;
 import com.appunite.debughelper.interceptor.DebugInterceptor;
 import com.appunite.debughelper.interceptor.SampleInterceptor;
+import com.appunite.debughelper.macro.FieldManager;
 import com.appunite.debughelper.macro.MacroFragment;
+import com.appunite.debughelper.macro.MacroService;
 import com.appunite.debughelper.model.SelectOption;
 import com.appunite.debughelper.presenter.DebugPresenter;
 import com.appunite.debughelper.utils.DebugOption;
@@ -60,12 +62,14 @@ public class DebugHelper {
     private static ViewGroup mainFrame;
     private static RecyclerView debugRecyclerView;
     private static DrawerLayout drawerLayout;
+    private static Activity appActivity;
 
     public static void setActivity(Activity activity) {
         currentActivity = activity;
         debugPreferences = new DebugHelperPreferences(currentActivity.getApplicationContext());
         debugPresenter = new DebugPresenter(currentActivity);
         debugAdapter = new DebugAdapter(debugPreferences);
+        FieldManager.init(debugPreferences);
     }
 
     @Nonnull
@@ -94,6 +98,7 @@ public class DebugHelper {
     }
 
     public static void reSubscribe(final Activity activity) {
+        appActivity = activity;
         debugPreferences = new DebugHelperPreferences(activity.getApplicationContext());
         debugPresenter = new DebugPresenter(activity);
 
@@ -149,6 +154,7 @@ public class DebugHelper {
 
                 debugPresenter.getFpsLabelObservable()
                         .filter(isInstalled())
+                        .mergeWith(debugPresenter.getPinMacroObservable())
                         .filter(new Func1<Boolean, Boolean>() {
                             @Override
                             public Boolean call(final Boolean aBoolean) {
@@ -240,6 +246,18 @@ public class DebugHelper {
                                         .commit();
                             }
                         }),
+                debugPresenter.getPinMacroObservable()
+                        .filter(canDrawOverlays())
+                        .subscribe(new Action1<Boolean>() {
+                            @Override
+                            public void call(final Boolean aBoolean) {
+                                if (aBoolean) {
+                                    appContext.startService(MacroService.newInstance(activity));
+                                } else {
+                                    appContext.stopService(MacroService.newInstance(activity));
+                                }
+                            }
+                        }),
                 debugPresenter.recreateActivityObservable()
                         .subscribe(new Action1<Object>() {
                             @Override
@@ -247,8 +265,9 @@ public class DebugHelper {
                                 activity.recreate();
                             }
                         })
-
         ));
+
+
     }
 
     private static Func1<Object, Boolean> isInterceptorNotImplemented() {
@@ -285,6 +304,9 @@ public class DebugHelper {
 
     public static void unSubscribe() {
         subscription.set(Subscriptions.empty());
+        if (appActivity != null) {
+            appContext.stopService(new Intent(appActivity, MacroService.class));
+        }
     }
 
     public static void install(Context context) {

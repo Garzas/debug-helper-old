@@ -229,6 +229,8 @@ public class DebugAdapter extends RecyclerView.Adapter<BaseDebugHolder> implemen
             title.setText(switchItem.getTitle());
             if (switchItem.isMockDepends()) {
                 mockDisabled.setVisibility(getDebugPreferences().getMockState() ? View.GONE : View.VISIBLE);
+            } else {
+                mockDisabled.setVisibility(View.GONE);
             }
 
             mSubscription = new CompositeSubscription(

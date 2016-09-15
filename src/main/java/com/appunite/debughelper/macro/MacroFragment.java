@@ -6,22 +6,16 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Spinner;
 
 import com.appunite.debughelper.R;
 import com.appunite.debughelper.dialog.EditDialog;
 import com.appunite.debughelper.model.EditMacro;
 import com.jakewharton.rxbinding.view.RxView;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -77,7 +71,6 @@ public class MacroFragment extends DialogFragment
         createMacroButton = (Button) rootView.findViewById(R.id.create_macro_button);
         recyclerView.setAdapter(adapter);
 
-
         subscriptions.set(new CompositeSubscription(
                 presenter.getMacroListObservable()
                         .mergeWith(presenter.getSaveMacrosObservable())
@@ -94,7 +87,6 @@ public class MacroFragment extends DialogFragment
 
         ));
 
-
         return rootView;
     }
 
@@ -104,36 +96,6 @@ public class MacroFragment extends DialogFragment
         super.onDestroyView();
     }
 
-    public void doMacro(final MacroPresenter.MacroItem macroItem) {
-        final List<SavedField> baseFieldItems = macroItem.getBaseFieldItems();
-
-        for (SavedField baseField : baseFieldItems) {
-            if (baseField != null) {
-                View view = viewGroup.findViewById(baseField.getIdView());
-                if (view instanceof EditText) {
-                    EditText editText = (EditText) view;
-                    editText.setText(baseField.getText());
-                } else if (view instanceof CompoundButton) {
-                    CompoundButton compoundButton = (CompoundButton) view;
-                    compoundButton.setChecked(baseField.isChecked());
-                } else if (view instanceof Spinner) {
-                    Spinner spinner = (Spinner) view;
-                    spinner.setSelection(baseField.getSelectedPosition());
-                } else if (view instanceof SearchView) {
-                    SearchView searchView = (SearchView) view;
-                    searchView.setQuery(baseField.getText(), false);
-//                } else if (view instanceof RecyclerView) {
-//                    RecyclerView recyclerView = (RecyclerView) view;
-//                    MacroRecyclerViewListener listener = (MacroRecyclerViewListener) recyclerView.getAdapter();
-//
-//                    listener.fillFields((List) adapterGson().fromJson(savedField.getJson(), savedField.getTypeToken()));
-                } else {
-                    //TODO list all not updated items
-                }
-            }
-        }
-    }
-
     @Override
     public void onChangeName(final int position, @Nonnull final String newName) {
         presenter.changeNameObserver().onNext(new EditMacro(position, newName));
@@ -141,7 +103,7 @@ public class MacroFragment extends DialogFragment
 
     @Override
     public void useMacro(MacroPresenter.MacroItem macroItem) {
-        doMacro(macroItem);
+        FieldManager.doMacro(macroItem, viewGroup);
         listener.onFinishDialog();
         dismiss();
     }
@@ -156,6 +118,11 @@ public class MacroFragment extends DialogFragment
     @Override
     public void deleteMacro(final int position) {
         presenter.deleteMacroObserver().onNext(position);
+    }
+
+    @Override
+    public void selectMacro(final String id) {
+        presenter.selectMacroObserver().onNext(id);
     }
 
 }

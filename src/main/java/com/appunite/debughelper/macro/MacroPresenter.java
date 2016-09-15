@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -54,6 +55,8 @@ public class MacroPresenter {
     private final Observable<List<MacroItem>> saveMacrosObservable;
     @Nonnull
     public final Subscription subscribe;
+    @Nonnull
+    private final PublishSubject<String> selectMacroSubject = PublishSubject.create();
 
     public MacroPresenter(@Nonnull final Activity activity) {
         this.activity = activity;
@@ -76,12 +79,15 @@ public class MacroPresenter {
                                 return macroItems;
                             }
                         }),
-
                 deleteMacroSubject
                         .withLatestFrom(macroItemsObservable, new Func2<Integer, List<MacroItem>, List<MacroItem>>() {
                             @Override
-                            public List<MacroItem> call(final Integer integer, final List<MacroItem> macroItems) {
-                                macroItems.remove((int) integer);
+                            public List<MacroItem> call(final Integer position, final List<MacroItem> macroItems) {
+                                final MacroItem macroItem = macroItems.get(position);
+                                if (macroItem.isSelected()) {
+                                    debugHelperPreferences.saveFastMacro(macroItem.getActivityName(), null);
+                                }
+                                macroItems.remove((int) position);
                                 return macroItems;
                             }
                         }),
@@ -92,7 +98,21 @@ public class MacroPresenter {
                                 macroItems.get(editMacro.getPosition()).setMacroName(editMacro.getName());
                                 return macroItems;
                             }
-                        }))
+                        }),
+                selectMacroSubject.withLatestFrom(macroItemsObservable, new Func2<String, List<MacroItem>, List<MacroItem>>() {
+                    @Override
+                    public List<MacroItem> call(final String id, final List<MacroItem> macroItems) {
+                        for (final MacroItem macroItem : macroItems) {
+                            if (macroItem.getId().equals(id)) {
+                                macroItem.setSelected(true);
+                                debugHelperPreferences.saveFastMacro(macroItem.getActivityName(), createGson().toJson(macroItem));
+                            } else {
+                                macroItem.setSelected(false);
+                            }
+                        }
+                        return macroItems;
+                    }
+                }))
                 .publish()
                 .refCount();
 
@@ -191,6 +211,11 @@ public class MacroPresenter {
     }
 
     @Nonnull
+    public final Observer<String> selectMacroObserver() {
+        return selectMacroSubject;
+    }
+
+    @Nonnull
     public Observable<List<MacroItem>> getSaveMacrosObservable() {
         return saveMacrosObservable;
     }
@@ -204,11 +229,14 @@ public class MacroPresenter {
         private List<SavedField> baseFieldItems;
         private final String activityName;
         private String macroName;
+        private boolean isSelected = false;
+        final String id;
 
         public MacroItem(final List<SavedField> baseFieldItems, final String activityName) {
             this.baseFieldItems = baseFieldItems;
             this.activityName = activityName;
             macroName = activityName + " Macro";
+            id = UUID.randomUUID().toString();
 
         }
 
@@ -226,6 +254,18 @@ public class MacroPresenter {
 
         public List<SavedField> getBaseFieldItems() {
             return baseFieldItems;
+        }
+
+        public void setSelected(final boolean selected) {
+            isSelected = selected;
+        }
+
+        public boolean isSelected() {
+            return isSelected;
+        }
+
+        public String getId() {
+            return id;
         }
 
         @Override

@@ -77,7 +77,8 @@ public class DebugPresenter {
     private final Observable<Object> interceptorNotImplemented;
     @Nonnull
     private final PublishSubject httpCodeChangedSubject = PublishSubject.create();
-
+    @Nonnull
+    private final Observable<Boolean> pinMacroObservable;
 
     public abstract static class BaseDebugItem {
     }
@@ -463,6 +464,7 @@ public class DebugPresenter {
                                 .addAll(buildInfo)
                                 .add(new CategoryItem("Macro"))
                                 .add(new ActionItem("Show Macro", DebugOption.SHOW_MACRO))
+                                .add(new SwitchItem("Pin", DebugOption.PIN_MACRO, false, false))
                                 .add(new CategoryItem("OKHTTP options"))
                                 .add(new SwitchItem("Return empty response", DebugOption.SET_EMPTY_RESPONSE, DebugInterceptor.getEmptyResponse(), true))
                                 .add(new OptionItem("Http code", DebugOption.SET_HTTP_CODE,
@@ -532,6 +534,15 @@ public class DebugPresenter {
                 })
                 .map(checkSet());
 
+        pinMacroObservable = switchOptionSubject
+                .filter(new Func1<SwitchOption, Boolean>() {
+                    @Override
+                    public Boolean call(final SwitchOption switchOption) {
+                        return switchOption.getOption() == DebugOption.PIN_MACRO;
+                    }
+                })
+                .map(checkSet());
+
         showLogObservable = actionSubject
                 .filter(new Func1<Integer, Boolean>() {
                     @Override
@@ -593,7 +604,7 @@ public class DebugPresenter {
     }
 
     @Nonnull
-    public Observer httpCodeChangedObserver() {
+    public Observer<Object> httpCodeChangedObserver() {
         return httpCodeChangedSubject;
     }
 
@@ -650,6 +661,11 @@ public class DebugPresenter {
     @Nonnull
     public Observable<Integer> getShowMacroObservable() {
         return showMacroObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getPinMacroObservable() {
+        return pinMacroObservable;
     }
 
     @Nonnull
