@@ -1,5 +1,6 @@
 package com.appunite.debughelper.macro;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,7 @@ import javax.annotation.Nonnull;
 import rx.functions.Action1;
 
 public class MacroAdapter extends RecyclerView.Adapter<MacroAdapter.MacroHolder>
-implements Action1<List<MacroPresenter.MacroItem>> {
+        implements Action1<List<MacroPresenter.MacroItem>> {
 
     private List<MacroPresenter.MacroItem> mData;
     private MacroListener listener;
@@ -38,6 +39,13 @@ implements Action1<List<MacroPresenter.MacroItem>> {
     public void onBindViewHolder(final MacroHolder holder, final int position) {
         final MacroPresenter.MacroItem macroItem = mData.get(position);
         holder.macroName.setText(macroItem.getMacroName());
+
+        if (macroItem.isSelected()) {
+            holder.itemView.setBackgroundColor(Color.DKGRAY);
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
         holder.useMacro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +66,14 @@ implements Action1<List<MacroPresenter.MacroItem>> {
             @Override
             public void onClick(View v) {
                 listener.deleteMacro(holder.getAdapterPosition());
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                listener.selectMacro(macroItem.getId());
+                return true;
             }
         });
     }
@@ -93,9 +109,14 @@ implements Action1<List<MacroPresenter.MacroItem>> {
     }
 
     public interface MacroListener {
+
         void useMacro(final MacroPresenter.MacroItem macroItem);
+
         void editMacro(final EditMacro editMacro);
+
         void deleteMacro(final int position);
+
+        void selectMacro(final String id);
     }
 
 }

@@ -24,8 +24,6 @@ public class DebugHelperPreferences {
     private static final String DEBUG_DRAWER_PREFS = "debug_drawer_prefs";
     private static final String MOCK_MODE = "debug_helper_mock_mode_status";
     private static final String DEBUG_MACRO = "debug_helper_macro_list";
-    private static final String SPECIAL_DEBUG_MACRO = "debug_helper_macro_list_special";
-    private static final String DEBUG_CLASS_TYPES = "debug_helper_class_type_list";
 
     @Nonnull
     private final SharedPreferences sharedPreferences;
@@ -64,13 +62,14 @@ public class DebugHelperPreferences {
         editor.apply();
     }
 
-    public void saveSpecialMacro(List list, List<Class> classList) {
-        String json = new Gson().toJson(list);
-        String classJson = new Gson().toJson(classList);
+    public void saveFastMacro(@Nonnull String activityName, String json) {
         final SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(SPECIAL_DEBUG_MACRO, json);
-        editor.putString(DEBUG_CLASS_TYPES, classJson);
+        editor.putString(activityName, json);
         editor.apply();
+    }
+
+    public String getFastMacro(@Nonnull final String activityName) {
+        return sharedPreferences.getString(activityName, "");
     }
 
     public String getMacroList() {
@@ -81,12 +80,4 @@ public class DebugHelperPreferences {
         return sharedPreferences.getBoolean(MOCK_MODE, false);
     }
 
-    public int getMockViewState() {
-        boolean mockState = sharedPreferences.getBoolean(MOCK_MODE, false);
-        if (mockState) {
-            return View.VISIBLE;
-        } else {
-            return View.GONE;
-        }
-    }
 }

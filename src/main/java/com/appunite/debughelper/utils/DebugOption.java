@@ -13,4 +13,6 @@ public class DebugOption {
     public static final int SET_EMPTY_RESPONSE = 8;
     public static final int SHOW_REQUEST = 9;
     public static final int SHOW_MACRO = 10;
+    public static final int PIN_MACRO = 11;
+
 }
